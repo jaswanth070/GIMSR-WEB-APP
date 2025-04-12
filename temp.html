@@ -77,22 +77,22 @@
     
     /* Modern Scrollbar */
     ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
     }
-    
+
     ::-webkit-scrollbar-track {
       background: #f1f1f1;
       border-radius: 10px;
     }
-    
+
     ::-webkit-scrollbar-thumb {
       background: #0d9488;
       border-radius: 10px;
     }
-    
+
     ::-webkit-scrollbar-thumb:hover {
-      background: #14b8a6;
+      background: #0f766e;
     }
     
     /* Smooth transitions */
@@ -141,28 +141,45 @@
     /* Tooltip */
     .tooltip {
       position: relative;
+      display: inline-block;
     }
     
     .tooltip .tooltip-text {
       visibility: hidden;
-      width: 120px;
-      background-color: #333;
+      width: 160px;
+      background-color: rgba(0, 0, 0, 0.8);
       color: #fff;
       text-align: center;
       border-radius: 6px;
-      padding: 5px;
+      padding: 8px;
       position: absolute;
-      z-index: 1;
+      z-index: 10;
       bottom: 125%;
       left: 50%;
-      margin-left: -60px;
+      margin-left: -80px;
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.3s, transform 0.3s;
+      transform: translateY(10px);
+      font-size: 0.75rem;
+      pointer-events: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     
     .tooltip:hover .tooltip-text {
       visibility: visible;
       opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .tooltip .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
     }
     
     /* Card hover effect */
@@ -281,50 +298,6 @@
       transform: translateY(-2px);
     }
 
-    /* Enhanced Tooltip */
-    .tooltip {
-      position: relative;
-      display: inline-block;
-    }
-    
-    .tooltip .tooltip-text {
-      visibility: hidden;
-      width: 160px;
-      background-color: rgba(0, 0, 0, 0.8);
-      color: #fff;
-      text-align: center;
-      border-radius: 6px;
-      padding: 8px;
-      position: absolute;
-      z-index: 10;
-      bottom: 125%;
-      left: 50%;
-      margin-left: -80px;
-      opacity: 0;
-      transition: opacity 0.3s, transform 0.3s;
-      transform: translateY(10px);
-      font-size: 0.75rem;
-      pointer-events: none;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    .tooltip:hover .tooltip-text {
-      visibility: visible;
-      opacity: 1;
-      transform: translateY(0);
-    }
-    
-    .tooltip .tooltip-text::after {
-      content: "";
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
-    }
-
     /* Modern flash loading effect for student data */
     .skeleton-loader {
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -339,6 +312,193 @@
       100% {
         background-position: -200% 0;
       }
+    }
+
+    /* Enhanced loading effects */
+    .pulse-loader {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .pulse-loader::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: pulse-loading 1.5s infinite;
+    }
+
+    @keyframes pulse-loading {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    /* Modern button styles */
+    .btn-modern {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .btn-modern::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      z-index: -1;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .btn-modern:hover::before {
+      transform: translateY(0);
+    }
+
+    /* Enhanced card styles */
+    .card-modern {
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(229, 231, 235, 0.5);
+      overflow: hidden;
+    }
+
+    .card-modern:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      transform: translateY(-2px);
+    }
+
+    /* Micro-interactions */
+    .micro-interaction {
+      transition: all 0.2s ease;
+    }
+
+    .micro-interaction:active {
+      transform: scale(0.97);
+    }
+
+    /* Button loading state */
+    .btn-loading {
+      position: relative;
+      pointer-events: none;
+    }
+
+    .btn-loading .btn-text {
+      visibility: hidden;
+    }
+
+    .btn-loading::after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: calc(50% - 8px);
+      left: calc(50% - 8px);
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* Tab indicator animation */
+    .tab-indicator {
+      position: relative;
+    }
+
+    .tab-indicator::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: currentColor;
+      transition: width 0.3s ease;
+    }
+
+    .tab-indicator.active::after {
+      width: 100%;
+    }
+
+    /* View transition animation */
+    .view-transition {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Mini loader for inline elements */
+    .mini-loader {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(13, 148, 136, 0.3);
+      border-radius: 50%;
+      border-top-color: #0d9488;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+    }
+
+    /* Improved tooltip */
+    .tooltip-modern {
+      position: relative;
+    }
+
+    .tooltip-modern .tooltip-content {
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .tooltip-modern:hover .tooltip-content {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .tooltip-modern .tooltip-content::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
     }
   </style>
 </head>
@@ -617,7 +777,6 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Set Current Date</label>
               <div class="flex space-x-2">
-                <input type="date" x-model="jumpToDate" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <button @click="jumpToSelectedDate()" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition shadow-sm hover:shadow">
                   Set Date
                 </button>
@@ -1142,9 +1301,9 @@
           </div>
           <div class="text-center md:text-right">
             <p class="text-sm">Developed and managed by 
-              <a href="https:/jaswanthmadiya.tech" target="_blank" class="font-bold hover:underline">Madiya Jaswanth</a>
+              <a href="https://madiyajaswanth.com" target="_blank" class="font-bold hover:underline">Madiya Jaswanth</a>
             </p>
-            <!-- <p class="text-xs text-primary-100 mt-1">Version 2.0</p> -->
+            <p class="text-xs text-primary-100 mt-1">Version 2.0</p>
           </div>
         </div>
       </div>
@@ -1222,6 +1381,18 @@
 
         // Filtered Students
         filteredStudents: [],
+
+        // Update the scheduler function to include more loading states and improved interactions
+
+        // Add these properties to the return object in the scheduler function
+        dataProcessing: false,
+        tabSwitchLoading: false,
+        dateChangeLoading: false,
+        filterApplyLoading: false,
+        exportLoading: false,
+        viewFullScheduleLoading: false,
+        viewStudentsInRotationLoading: false,
+        viewBatchStudentsLoading: false,
         
         // Store original today date
         originalToday: null,
@@ -1297,8 +1468,7 @@
           try {
             this.dataLoading = true;
             this.loadingSubMessage = 'Fetching student data from CSV...';
-            // const response = await fetch('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/students_with_batches-tv4kpvt1mYqOckOvxTNzZ96H2Q9Bp1.csv');
-            const response = await fetch('https://raw.githubusercontent.com/jaswanth070/GIMSR-WEB-APP/refs/heads/main/students_with_batches.csv');
+            const response = await fetch('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/students_with_batches-tv4kpvt1mYqOckOvxTNzZ96H2QBp1.csv');
             const csvData = await response.text();
             
             this.loadingSubMessage = 'Parsing student data...';
