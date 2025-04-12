@@ -1297,7 +1297,8 @@
           try {
             this.dataLoading = true;
             this.loadingSubMessage = 'Fetching student data from CSV...';
-            const response = await fetch('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/students_with_batches-tv4kpvt1mYqOckOvxTNzZ96H2Q9Bp1.csv');
+            // const response = await fetch('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/students_with_batches-tv4kpvt1mYqOckOvxTNzZ96H2Q9Bp1.csv');
+            const response = await fetch('https://raw.githubusercontent.com/jaswanth070/GIMSR-WEB-APP/refs/heads/main/students_with_batches.csv');
             const csvData = await response.text();
             
             this.loadingSubMessage = 'Parsing student data...';
