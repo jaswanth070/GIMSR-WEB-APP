@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,10 +58,27 @@
   <style>
     [x-cloak] { display: none !important; }
     
+    /* Loading Animation */
+    .loader {
+      border-top-color: #0d9488;
+      -webkit-animation: spinner 1.5s linear infinite;
+      animation: spinner 1.5s linear infinite;
+    }
+    
+    @-webkit-keyframes spinner {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+    
+    @keyframes spinner {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
     /* Modern Scrollbar */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
     }
     
     ::-webkit-scrollbar-track {
@@ -122,6 +138,149 @@
       transition: opacity 300ms, transform 300ms;
     }
     
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+    }
+    
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 120px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -60px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Card hover effect */
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Phase grouping in full schedule */
+    .phase-group {
+      border-left: 4px solid;
+    }
+    
+    .phase-group-M {
+      border-color: #3b82f6;
+    }
+    
+    .phase-group-S {
+      border-color: #10b981;
+    }
+    
+    .phase-group-O {
+      border-color: #8b5cf6;
+    }
+    
+    .phase-group-Misc {
+      border-color: #f59e0b;
+    }
+    
+    .phase-group-CM {
+      border-color: #ef4444;
+    }
+    
+    /* Calendar view enhancements */
+    .calendar-day {
+      min-height: 120px;
+      transition: all 0.2s ease;
+      background-color: white;
+    }
+    
+    .calendar-day:hover {
+      background-color: #f0fdfa;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .calendar-day.today {
+      background-color: #ccfbf1;
+      border: 2px solid #14b8a6;
+    }
+    
+    .calendar-header {
+      background-color: #0f766e;
+      color: white;
+      padding: 10px;
+      border-radius: 6px 6px 0 0;
+    }
+    
+    /* Glass morphism effect */
+    .glass {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    /* Search input styling */
+    .search-input {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23999' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' /%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 0.625rem 0.75rem;
+      background-size: 1rem;
+      padding-left: 2.5rem;
+    }
+
+    /* Enhanced loading effects */
+    .animate-pulse-slow {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: .5;
+      }
+    }
+
+    .loader {
+      border-top-color: #0d9488;
+      -webkit-animation: spinner 1.5s linear infinite;
+      animation: spinner 1.5s linear infinite;
+    }
+
+    @-webkit-keyframes spinner {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spinner {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .shadow-hover {
+      transition: all 0.3s ease;
+    }
+
+    .shadow-hover:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      transform: translateY(-2px);
+    }
+
     /* Enhanced Tooltip */
     .tooltip {
       position: relative;
@@ -181,294 +340,80 @@
         background-position: -200% 0;
       }
     }
-
-    /* Enhanced loading effects */
-    .animate-pulse-slow {
-      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: .5;
-      }
-    }
-
-    .loader {
-      border-top-color: #0d9488;
-      -webkit-animation: spinner 1.5s linear infinite;
-      animation: spinner 1.5s linear infinite;
-    }
-
-    @-webkit-keyframes spinner {
-      0% { -webkit-transform: rotate(0deg); }
-      100% { -webkit-transform: rotate(360deg); }
-    }
-
-    @keyframes spinner {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Shadow hover effect */
-    .shadow-hover {
-      transition: all 0.3s ease;
-    }
-
-    .shadow-hover:hover {
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      transform: translateY(-2px);
-    }
-
-    /* Card hover effect */
-    .card-hover {
-      transition: all 0.3s ease;
-    }
-    
-    .card-hover:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-    }
-    
-    /* Phase grouping in full schedule */
-    .phase-group {
-      border-left: 4px solid;
-    }
-    
-    .phase-group-M {
-      border-color: #3b82f6;
-    }
-    
-    .phase-group-S {
-      border-color: #10b981;
-    }
-    
-    .phase-group-O {
-      border-color: #8b5cf6;
-    }
-    
-    .phase-group-Misc {
-      border-color: #f59e0b;
-    }
-    
-    .phase-group-CM {
-      border-color: #ef4444;
-    }
-    
-    /* Calendar view enhancements */
-    .calendar-day {
-      min-height: 120px;
-      transition: all 0.3s ease;
-      background-color: white;
-    }
-    
-    .calendar-day:hover {
-      background-color: #f0fdfa;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-    
-    .calendar-day.today {
-      background-color: #ccfbf1;
-      border: 2px solid #14b8a6;
-    }
-    
-    .calendar-header {
-      background-color: #0f766e;
-      color: white;
-      padding: 10px;
-      border-radius: 6px 6px 0 0;
-    }
-
-    /* Glass morphism effect */
-    .glass {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Search input styling */
-    .search-input {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23999' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' /%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: 0.75rem 50%;
-      background-size: 1rem;
-      padding-left: 2.5rem;
-    }
-
-    /* Button hover effects */
-    .btn-hover {
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-hover:after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: -100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: all 0.6s ease;
-    }
-
-    .btn-hover:hover:after {
-      left: 100%;
-    }
-
-    /* Table row hover effect */
-    .table-row-hover {
-      transition: all 0.2s ease;
-    }
-
-    .table-row-hover:hover {
-      background-color: #f0fdfa;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    }
-
-    /* Badge styles */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    }
-
-    .badge:hover {
-      transform: scale(1.05);
-    }
-
-    /* Improved calendar day styling */
-    .calendar-event {
-      transition: all 0.2s ease;
-      border-left: 3px solid transparent;
-    }
-
-    .calendar-event:hover {
-      transform: translateX(2px);
-    }
-
-    /* Dropdown animation */
-    .dropdown-content {
-      transform-origin: top;
-      transform: scaleY(0);
-      opacity: 0;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-    }
-
-    .dropdown-content.active {
-      transform: scaleY(1);
-      opacity: 1;
-    }
-
-    /* Improved focus styles */
-    input:focus, select:focus, button:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.3);
-    }
   </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-gray-50">
   <!-- Alpine.js for reactivity -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
 
   <div x-data="scheduler()" x-init="initialize()" class="min-h-screen flex flex-col">
     <!-- Loading Overlay -->
-    <div x-show="loading" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm">
-      <div class="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center max-w-md w-full transform transition-all">
-        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-14 w-14 mb-5"></div>
-        <h2 class="text-2xl font-bold text-primary-700 mb-3" x-text="loadingMessage"></h2>
-        <p class="text-gray-600 text-center" x-text="loadingSubMessage"></p>
-        <div class="w-full bg-gray-200 rounded-full h-1.5 mt-6">
-          <div class="bg-primary-600 h-1.5 rounded-full animate-pulse-slow" style="width: 100%"></div>
-        </div>
+    <div x-show="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+        <h2 class="text-xl font-semibold text-primary-700 mb-2" x-text="loadingMessage"></h2>
+        <p class="text-gray-600" x-text="loadingSubMessage"></p>
       </div>
     </div>
 
     <!-- Full Schedule Modal -->
-    <div x-show="showFullScheduleModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-40 overflow-auto p-4 backdrop-blur-sm" 
-         x-transition:enter="transition ease-out duration-300" 
-         x-transition:enter-start="opacity-0 transform scale-95" 
-         x-transition:enter-end="opacity-100 transform scale-100" 
-         x-transition:leave="transition ease-in duration-200" 
-         x-transition:leave-start="opacity-100 transform scale-100" 
-         x-transition:leave-end="opacity-0 transform scale-95"
+    <div x-show="showFullScheduleModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 overflow-auto p-4" 
+         x-transition:enter="modal-enter" 
+         x-transition:enter-start="opacity-0" 
+         x-transition:enter-end="opacity-100" 
+         x-transition:leave="modal-exit" 
+         x-transition:leave-start="opacity-100" 
+         x-transition:leave-end="opacity-0"
          @click.self="showFullScheduleModal = false">
-      <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-primary-700 to-primary-800 text-white">
-          <h2 class="text-xl font-bold flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <span x-text="`Full Schedule for ${getStudentName(selectedStudentId)}`"></span>
-          </h2>
-          <button @click="showFullScheduleModal = false" class="text-white hover:text-gray-200 transition-colors p-1 rounded-full hover:bg-white/10">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-primary-700 text-white">
+          <h2 class="text-xl font-bold" x-text="`Full Schedule for ${getStudentName(selectedStudentId)}`"></h2>
+          <button @click="showFullScheduleModal = false" class="text-white hover:text-gray-200">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div class="p-6 overflow-auto flex-grow">
+        <div class="p-4 overflow-auto flex-grow">
           <div class="overflow-x-auto">
             <template x-for="(phaseGroup, phaseCode) in getFullScheduleByPhase(selectedStudentId)" :key="phaseCode">
-              <div :class="`mb-8 phase-group phase-group-${phaseCode} pl-4`">
-                <h3 class="text-lg font-bold mb-3 flex items-center">
-                  <span class="w-3 h-3 rounded-full mr-2" :class="{
-                    'bg-blue-500': phaseCode === 'M',
-                    'bg-green-500': phaseCode === 'S',
-                    'bg-purple-500': phaseCode === 'O',
-                    'bg-yellow-500': phaseCode === 'Misc',
-                    'bg-red-500': phaseCode === 'CM'
-                  }"></span>
-                  <span x-text="getPhaseName(phaseCode)"></span>
-                </h3>
-                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                  <table class="min-w-full border-collapse">
-                    <thead>
-                      <tr class="bg-gray-50 text-left">
-                        <th class="px-4 py-3 text-sm font-medium text-gray-600">Week</th>
-                        <th class="px-4 py-3 text-sm font-medium text-gray-600">Date Range</th>
-                        <th class="px-4 py-3 text-sm font-medium text-gray-600">Rotation</th>
-                        <th class="px-4 py-3 text-sm font-medium text-gray-600">Sub-Phase</th>
+              <div :class="`mb-6 phase-group phase-group-${phaseCode} pl-4`">
+                <h3 class="text-lg font-semibold mb-2" x-text="getPhaseName(phaseCode)"></h3>
+                <table class="min-w-full border-collapse">
+                  <thead>
+                    <tr>
+                      <th class="border px-4 py-2 bg-gray-100">Week</th>
+                      <th class="border px-4 py-2 bg-gray-100">Date Range</th>
+                      <th class="border px-4 py-2 bg-gray-100">Rotation</th>
+                      <th class="border px-4 py-2 bg-gray-100">Sub-Phase</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="(week, index) in phaseGroup" :key="index">
+                      <tr :class="{'bg-primary-50': week.isCurrentWeek}">
+                        <td class="border px-4 py-2 font-medium" x-text="week.weekNumber"></td>
+                        <td class="border px-4 py-2" x-text="week.dateRange"></td>
+                        <td class="border px-4 py-2">
+                          <div class="tooltip">
+                            <div :class="`px-2 py-1 rounded text-xs font-medium inline-block ${getRotationColorClass(week.rotation)}`" 
+                                 x-text="week.rotation"></div>
+                            <span class="tooltip-text" x-text="getRotationName(week.rotation)"></span>
+                          </div>
+                        </td>
+                        <td class="border px-4 py-2" x-text="getRotationName(week.rotation)"></td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      <template x-for="(week, index) in phaseGroup" :key="index">
-                        <tr :class="{'bg-primary-50': week.isCurrentWeek, 'table-row-hover': !week.isCurrentWeek}">
-                          <td class="px-4 py-3 font-medium border-b border-gray-100" x-text="week.weekNumber"></td>
-                          <td class="px-4 py-3 border-b border-gray-100" x-text="week.dateRange"></td>
-                          <td class="px-4 py-3 border-b border-gray-100">
-                            <div class="tooltip">
-                              <div :class="`px-2 py-1 rounded-md text-xs font-medium inline-block badge ${getRotationColorClass(week.rotation)}`" 
-                                   x-text="week.rotation"></div>
-                              <span class="tooltip-text" x-text="getRotationName(week.rotation)"></span>
-                            </div>
-                          </td>
-                          <td class="px-4 py-3 border-b border-gray-100" x-text="getRotationName(week.rotation)"></td>
-                        </tr>
-                      </template>
-                    </tbody>
-                  </table>
-                </div>
+                    </template>
+                  </tbody>
+                </table>
               </div>
             </template>
           </div>
         </div>
-        <div class="p-4 border-t border-gray-200 flex justify-end bg-gray-50">
-          <button @click="exportStudentScheduleToCSV(selectedStudentId)" class="bg-primary-600 text-white px-5 py-2 rounded-lg hover:bg-primary-700 transition mr-3 btn-hover flex items-center shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
+        <div class="p-4 border-t border-gray-200 flex justify-end">
+          <button @click="exportStudentScheduleToCSV(selectedStudentId)" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition mr-2">
             Export to CSV
           </button>
-          <button @click="showFullScheduleModal = false" class="border border-gray-300 bg-white px-5 py-2 rounded-lg hover:bg-gray-100 transition shadow-sm">
+          <button @click="showFullScheduleModal = false" class="border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-100 transition">
             Close
           </button>
         </div>
@@ -476,84 +421,65 @@
     </div>
 
     <!-- Sub-Phase Students Modal -->
-    <div x-show="showSubPhaseStudentsModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-40 overflow-auto p-4 backdrop-blur-sm" 
-         x-transition:enter="transition ease-out duration-300" 
-         x-transition:enter-start="opacity-0 transform scale-95" 
-         x-transition:enter-end="opacity-100 transform scale-100" 
-         x-transition:leave="transition ease-in duration-200" 
-         x-transition:leave-start="opacity-100 transform scale-100" 
-         x-transition:leave-end="opacity-0 transform scale-95"
+    <div x-show="showSubPhaseStudentsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 overflow-auto p-4" 
+         x-transition:enter="modal-enter" 
+         x-transition:enter-start="opacity-0" 
+         x-transition:enter-end="opacity-100" 
+         x-transition:leave="modal-exit" 
+         x-transition:leave-start="opacity-100" 
+         x-transition:leave-end="opacity-0"
          @click.self="showSubPhaseStudentsModal = false">
-      <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-primary-700 to-primary-800 text-white">
-          <h2 class="text-xl font-bold flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span x-text="`Students in ${selectedRotation} Rotation`"></span>
-          </h2>
-          <button @click="showSubPhaseStudentsModal = false" class="text-white hover:text-gray-200 transition-colors p-1 rounded-full hover:bg-white/10">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-primary-700 text-white">
+          <h2 class="text-xl font-bold" x-text="`Students in ${selectedRotation} Rotation`"></h2>
+          <button @click="showSubPhaseStudentsModal = false" class="text-white hover:text-gray-200">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div class="p-6 overflow-auto flex-grow">
-          <div class="mb-4 relative">
+        <div class="p-4 overflow-auto flex-grow">
+          <div class="mb-4">
             <input 
               type="text" 
               x-model="subPhaseStudentSearch" 
               placeholder="Search by name or registration number" 
-              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all shadow-sm search-input"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 search-input"
             >
-            <div x-show="subPhaseStudentSearch.length > 0" class="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <button @click="subPhaseStudentSearch = ''" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
           </div>
           <div class="overflow-x-auto">
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-              <table class="min-w-full border-collapse">
-                <thead>
-                  <tr class="bg-gray-50 text-left">
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Reg. No.</th>
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Name</th>
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Batch</th>
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Start Date</th>
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">End Date</th>
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+            <table class="min-w-full border-collapse">
+              <thead>
+                <tr>
+                  <th class="border px-4 py-2 bg-gray-100">Reg. No.</th>
+                  <th class="border px-4 py-2 bg-gray-100">Name</th>
+                  <th class="border px-4 py-2 bg-gray-100">Batch</th>
+                  <th class="border px-4 py-2 bg-gray-100">Start Date</th>
+                  <th class="border px-4 py-2 bg-gray-100">End Date</th>
+                  <th class="border px-4 py-2 bg-gray-100">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="student in getFilteredSubPhaseStudents()" :key="student.id">
+                  <tr class="hover:bg-gray-50 transition-all">
+                    <td class="border px-4 py-2 font-medium" x-text="student.regdNo"></td>
+                    <td class="border px-4 py-2" x-text="student.name"></td>
+                    <td class="border px-4 py-2" x-text="student.batch"></td>
+                    <td class="border px-4 py-2" x-text="formatDate(student.startDate)"></td>
+                    <td class="border px-4 py-2" x-text="formatDate(student.endDate)"></td>
+                    <td class="border px-4 py-2">
+                      <button @click="viewFullSchedule(student.id)" class="bg-primary-600 text-white px-2 py-1 rounded text-xs hover:bg-primary-700 transition shadow-sm hover:shadow">
+                        View Full Schedule
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  <template x-for="student in getFilteredSubPhaseStudents()" :key="student.id">
-                    <tr class="table-row-hover">
-                      <td class="px-4 py-3 font-medium border-b border-gray-100" x-text="student.regdNo"></td>
-                      <td class="px-4 py-3 border-b border-gray-100" x-text="student.name"></td>
-                      <td class="px-4 py-3 border-b border-gray-100">
-                        <span class="px-2 py-1 bg-gray-100 rounded-md text-xs font-medium" x-text="student.batch"></span>
-                      </td>
-                      <td class="px-4 py-3 border-b border-gray-100" x-text="formatDate(student.startDate)"></td>
-                      <td class="px-4 py-3 border-b border-gray-100" x-text="formatDate(student.endDate)"></td>
-                      <td class="px-4 py-3 border-b border-gray-100">
-                        <button @click="viewFullSchedule(student.id)" class="bg-primary-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-primary-700 transition shadow-sm btn-hover flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                          </svg>
-                          View Full Schedule
-                        </button>
-                      </td>
-                    </tr>
-                  </template>
-                </tbody>
-              </table>
-            </div>
+                </template>
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="p-4 border-t border-gray-200 flex justify-end bg-gray-50">
-          <button @click="showSubPhaseStudentsModal = false" class="border border-gray-300 bg-white px-5 py-2 rounded-lg hover:bg-gray-100 transition shadow-sm">
+        <div class="p-4 border-t border-gray-200 flex justify-end">
+          <button @click="showSubPhaseStudentsModal = false" class="border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-100 transition">
             Close
           </button>
         </div>
@@ -561,12 +487,12 @@
     </div>
 
     <!-- Header -->
-    <header class="bg-gradient-to-r from-primary-800 to-primary-950 text-white shadow-lg sticky top-0 z-30">
+    <header class="bg-gradient-to-r from-primary-800 to-primary-950 text-white shadow-lg">
       <div class="container mx-auto px-4 py-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
-          <div class="flex items-center mb-3 md:mb-0">
-            <div class="bg-white p-1.5 mr-3 w-12 h-12 flex items-center justify-center shadow-md">
-              <img src="https://gimsr.gitam.edu/Images/gimsr-image-ivory.svg" alt="Logo" class="full" />
+          <div class="flex items-center mb-2 md:mb-0">
+            <div class="bg-white p-1 rounded-full mr-3 w-12 h-12 flex items-center justify-center">
+              <img src="https://gimsr.gitam.edu/Images/gimsr-image-ivory.svg" alt="Logo" class="rounded-full" />
             </div>
             <div>
               <h1 class="text-2xl font-bold">Medical Rotation Scheduler</h1>
@@ -574,7 +500,7 @@
             </div>
           </div>
           <div class="flex space-x-2">
-            <button @click="prepareAndExportToCSV()" class="bg-white text-primary-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition flex items-center shadow-md btn-hover">
+            <button @click="prepareAndExportToCSV()" class="bg-white text-primary-700 px-4 py-2 rounded-md hover:bg-gray-100 transition flex items-center shadow-md">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
@@ -588,7 +514,7 @@
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-6 flex-grow">
       <!-- Filters -->
-      <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold text-primary-700 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -597,24 +523,18 @@
             Filters
           </h2>
           <div class="flex items-center">
-            <button @click="toggleFilters()" class="text-primary-700 hover:text-primary-500 transition p-1 rounded-full hover:bg-primary-50">
+            <button @click="toggleFilters()" class="text-primary-700 hover:text-primary-500 transition">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{'rotate-180': !showFilters}">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
           </div>
         </div>
-        <div x-show="showFilters" 
-             x-transition:enter="transition ease-out duration-200" 
-             x-transition:enter-start="opacity-0 transform -translate-y-4" 
-             x-transition:enter-end="opacity-100 transform translate-y-0" 
-             x-transition:leave="transition ease-in duration-150" 
-             x-transition:leave-start="opacity-100 transform translate-y-0" 
-             x-transition:leave-end="opacity-0 transform -translate-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div x-show="showFilters" x-collapse>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Batch</label>
-              <select x-model="filters.batch" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white shadow-sm">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Batch</label>
+              <select x-model="filters.batch" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option value="all">All Batches</option>
                 <option value="A">Batch A</option>
                 <option value="B">Batch B</option>
@@ -623,8 +543,8 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Phase</label>
-              <select x-model="filters.phase" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white shadow-sm">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Phase</label>
+              <select x-model="filters.phase" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option value="all">All Phases</option>
                 <option value="M">Medicine</option>
                 <option value="S">Surgery</option>
@@ -634,31 +554,31 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
               <div class="flex space-x-2">
-                <input type="date" x-model="filters.startDate" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white shadow-sm">
-                <input type="date" x-model="filters.endDate" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white shadow-sm">
+                <input type="date" x-model="filters.startDate" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <input type="date" x-model="filters.endDate" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
               </div>
             </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Student</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Student</label>
               <div class="relative">
                 <input 
                   type="text" 
                   x-model="studentSearchQuery" 
                   placeholder="Search by name or reg. no." 
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white shadow-sm search-input"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 search-input"
                 >
                 <div x-show="studentSearchLoading" class="absolute inset-y-0 right-3 flex items-center">
                   <div class="loader ease-linear rounded-full border-2 border-t-2 border-gray-200 h-4 w-4"></div>
                 </div>
-                <div x-show="studentSearchResults.length > 0 && studentSearchQuery.length > 0" class="absolute z-10 w-full mt-1 bg-white shadow-xl rounded-lg max-h-60 overflow-auto border border-gray-100">
+                <div x-show="studentSearchResults.length > 0 && studentSearchQuery.length > 0" class="absolute z-10 w-full mt-1 bg-white shadow-lg rounded-md max-h-60 overflow-auto">
                   <template x-for="student in studentSearchResults" :key="student.id">
                     <div 
                       @click="selectStudent(student.id)" 
-                      class="px-4 py-3 hover:bg-primary-50 cursor-pointer transition-colors border-b border-gray-100 last:border-b-0"
+                      class="px-4 py-2 hover:bg-primary-50 cursor-pointer"
                     >
                       <div class="font-medium" x-text="student.regdNo"></div>
                       <div class="text-sm text-gray-600" x-text="student.name"></div>
@@ -668,8 +588,8 @@
               </div>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Rotation</label>
-              <select x-model="filters.rotation" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white shadow-sm">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Rotation</label>
+              <select x-model="filters.rotation" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option value="all">All Rotations</option>
                 <option value="GM">General Medicine</option>
                 <option value="PY">Psychiatry</option>
@@ -695,26 +615,20 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Set Current Date</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Set Current Date</label>
               <div class="flex space-x-2">
-                <input type="date" x-model="jumpToDate" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white shadow-sm">
-                <button @click="jumpToSelectedDate()" class="bg-primary-600 text-white px-4 py-2.5 rounded-lg hover:bg-primary-700 transition shadow-sm btn-hover">
+                <input type="date" x-model="jumpToDate" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <button @click="jumpToSelectedDate()" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition shadow-sm hover:shadow">
                   Set Date
                 </button>
               </div>
             </div>
           </div>
-          <div class="mt-6 flex flex-wrap gap-3">
-            <button @click="applyFilters()" class="bg-primary-600 text-white px-5 py-2.5 rounded-lg hover:bg-primary-700 transition shadow-sm btn-hover flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
+          <div class="mt-4">
+            <button @click="applyFilters()" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition shadow-sm hover:shadow">
               Apply Filters
             </button>
-            <button @click="resetFilters()" class="border border-primary-600 text-primary-600 px-5 py-2.5 rounded-lg hover:bg-primary-50 transition flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+            <button @click="resetFilters()" class="ml-2 border border-primary-600 text-primary-600 px-4 py-2 rounded-md hover:bg-primary-50 transition">
               Reset
             </button>
           </div>
@@ -722,34 +636,34 @@
       </div>
 
       <!-- View Type Selector -->
-      <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-        <div class="flex flex-wrap gap-3">
-          <button @click="viewType = 'dashboard'" :class="`px-4 py-2.5 rounded-lg transition flex items-center ${viewType === 'dashboard' ? 'bg-primary-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div class="flex flex-wrap gap-2">
+          <button @click="viewType = 'dashboard'" :class="`px-4 py-2 rounded-md transition flex items-center ${viewType === 'dashboard' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
             </svg>
             Dashboard
           </button>
-          <button @click="viewType = 'calendar'" :class="`px-4 py-2.5 rounded-lg transition flex items-center ${viewType === 'calendar' ? 'bg-primary-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+          <button @click="viewType = 'calendar'" :class="`px-4 py-2 rounded-md transition flex items-center ${viewType === 'calendar' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
             </svg>
             Calendar
           </button>
-          <button @click="viewType = 'student'" :class="`px-4 py-2.5 rounded-lg transition flex items-center ${viewType === 'student' ? 'bg-primary-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+          <button @click="viewType = 'student'" :class="`px-4 py-2 rounded-md transition flex items-center ${viewType === 'student' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
             </svg>
             Students
           </button>
-          <button @click="viewType = 'rotation'" :class="`px-4 py-2.5 rounded-lg transition flex items-center ${viewType === 'rotation' ? 'bg-primary-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+          <button @click="viewType = 'rotation'" :class="`px-4 py-2 rounded-md transition flex items-center ${viewType === 'rotation' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h10v10H5V5z" />
             </svg>
             Rotations
           </button>
-          <button @click="viewType = 'batch'" :class="`px-4 py-2.5 rounded-lg transition flex items-center ${viewType === 'batch' ? 'bg-primary-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+          <button @click="viewType = 'batch'" :class="`px-4 py-2 rounded-md transition flex items-center ${viewType === 'batch' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
             </svg>
             Batches
@@ -758,95 +672,53 @@
       </div>
 
       <!-- Dashboard View -->
-      <div x-show="viewType === 'dashboard'" 
-           x-transition:enter="transition ease-out duration-300" 
-           x-transition:enter-start="opacity-0 transform translate-y-4" 
-           x-transition:enter-end="opacity-100 transform translate-y-0">
+      <div x-show="viewType === 'dashboard'">
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all card-hover border border-gray-100">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-700">Total Students</h3>
-              <div class="bg-primary-100 p-2 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </div>
-            </div>
-            <p class="text-3xl font-bold text-primary-600" x-text="students.length"></p>
-            <div class="mt-2 text-sm text-gray-500 flex items-center">
-              <span>Across all batches</span>
-              <span class="ml-auto bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">Active</span>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-all card-hover">
+            <h3 class="text-lg font-semibold text-gray-700">Total Students</h3>
+            <p class="text-3xl font-bold text-primary-600 mt-2" x-text="students.length"></p>
+            <div class="mt-2 text-sm text-gray-500">Across all batches</div>
           </div>
-          <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all card-hover border border-gray-100">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-700">Active Rotations</h3>
-              <div class="bg-primary-100 p-2 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              </div>
-            </div>
-            <p class="text-3xl font-bold text-primary-600" x-text="getActiveRotationsCount()"></p>
+          <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-all card-hover">
+            <h3 class="text-lg font-semibold text-gray-700">Active Rotations</h3>
+            <p class="text-3xl font-bold text-primary-600 mt-2" x-text="getActiveRotationsCount()"></p>
             <div class="mt-2 text-sm text-gray-500">Currently in progress</div>
           </div>
-          <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all card-hover border border-gray-100">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-700">Current Week</h3>
-              <div class="bg-primary-100 p-2 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-            </div>
-            <p class="text-3xl font-bold text-primary-600" x-text="getCurrentWeek()"></p>
+          <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-all card-hover">
+            <h3 class="text-lg font-semibold text-gray-700">Current Week</h3>
+            <p class="text-3xl font-bold text-primary-600 mt-2" x-text="getCurrentWeek()"></p>
             <div class="mt-2 text-sm text-gray-500">Of 53 total weeks</div>
           </div>
-          <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all card-hover border border-gray-100">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-700">Completion</h3>
-              <div class="bg-primary-100 p-2 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
+          <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-all card-hover">
+            <h3 class="text-lg font-semibold text-gray-700">Completion</h3>
             <div class="mt-2 h-4 bg-gray-200 rounded-full overflow-hidden">
               <div class="h-full bg-primary-600 transition-all" :style="`width: ${getCompletionPercentage()}%`"></div>
             </div>
-            <p class="text-sm text-gray-600 mt-2 font-medium" x-text="`${getCompletionPercentage()}% Complete`"></p>
+            <p class="text-sm text-gray-600 mt-1" x-text="`${getCompletionPercentage()}% Complete`"></p>
           </div>
         </div>
 
         <!-- Batch Overview -->
-        <div class="bg-white rounded-xl shadow-md p-6 mb-8 border border-gray-100">
-          <h2 class="text-xl font-semibold text-primary-700 mb-6 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+          <h2 class="text-xl font-semibold text-primary-700 mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
             Batch Overview
           </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <template x-for="batch in ['A', 'B', 'C', 'D']" :key="batch">
-              <div class="border border-gray-200 rounded-xl p-5 hover:border-primary-500 transition-all shadow-hover">
-                <div class="flex justify-between items-center mb-3">
-                  <h3 class="text-lg font-semibold flex items-center">
-                    <span class="w-3 h-3 rounded-full mr-2" :class="{
-                      'bg-blue-500': batch === 'A',
-                      'bg-green-500': batch === 'B',
-                      'bg-purple-500': batch === 'C',
-                      'bg-yellow-500': batch === 'D'
-                    }"></span>
-                    <span x-text="`Batch ${batch}`"></span>
-                  </h3>
-                  <span class="bg-primary-600 text-white text-xs px-2.5 py-1 rounded-full" x-text="getStudentCountInBatch(batch)"></span>
+              <div class="border rounded-lg p-4 hover:border-primary-500 transition-all">
+                <div class="flex justify-between items-center mb-2">
+                  <h3 class="text-lg font-semibold" x-text="`Batch ${batch}`"></h3>
+                  <span class="bg-primary-600 text-white text-xs px-2 py-1 rounded-full" x-text="getStudentCountInBatch(batch)"></span>
                 </div>
-                <div class="mb-3 p-3 bg-gray-50 rounded-lg">
+                <div class="mb-2">
                   <span class="text-sm text-gray-500">Current Phase:</span>
-                  <div class="font-medium text-lg" x-text="getCurrentPhaseForBatch(batch).phase"></div>
+                  <span class="font-medium" x-text="getCurrentPhaseForBatch(batch).phase"></span>
                 </div>
-                <div class="mb-3">
+                <div class="mb-2">
                   <span class="text-sm text-gray-500">Date Range:</span>
                   <div class="font-medium">
                     <span x-text="formatDate(getCurrentPhaseForBatch(batch).startDate)"></span> - 
@@ -863,38 +735,38 @@
         </div>
 
         <!-- Current Rotations -->
-        <div class="bg-white rounded-xl shadow-md p-6 mb-8 border border-gray-100">
-          <h2 class="text-xl font-semibold text-primary-700 mb-6 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+          <h2 class="text-xl font-semibold text-primary-700 mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Current Rotations
           </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <template x-for="rotation in getActiveRotations().slice(0, 6)" :key="rotation.id">
-              <div class="border border-gray-200 rounded-xl p-5 hover:border-primary-500 transition-all shadow-hover">
-                <div class="flex justify-between items-center mb-3">
-                  <div class="flex items-center">
-                    <div :class="`px-2.5 py-1 rounded-lg text-xs font-medium inline-block mr-2 ${getRotationColorClass(rotation.code)}`" 
-                         x-text="rotation.code"></div>
-                    <span class="font-medium" x-text="rotation.name"></span>
+              <div class="border rounded-lg p-4 hover:border-primary-500 transition-all">
+                <div class="flex justify-between items-center mb-2">
+                  <div>
+                    <span :class="`px-2 py-1 rounded text-xs font-medium inline-block ${getRotationColorClass(rotation.code)}`" 
+                         x-text="rotation.code"></span>
+                    <span class="ml-2 font-medium" x-text="rotation.name"></span>
                   </div>
-                  <span class="bg-gray-200 text-gray-800 text-xs px-2.5 py-1 rounded-full" x-text="rotation.studentCount"></span>
+                  <span class="bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded-full" x-text="rotation.studentCount"></span>
                 </div>
-                <div class="mb-3 p-3 bg-gray-50 rounded-lg">
+                <div class="mb-2">
                   <span class="text-sm text-gray-500">Phase:</span>
-                  <span class="font-medium ml-1" x-text="rotation.phase"></span>
+                  <span class="font-medium" x-text="rotation.phase"></span>
                 </div>
-                <div class="text-sm text-gray-500 mb-4">
+                <div class="text-sm text-gray-500">
                   <span x-text="formatDate(rotation.startDate)"></span> - 
                   <span x-text="formatDate(rotation.endDate)"></span>
                 </div>
-                <div>
+                <div class="mt-2">
                   <button 
                     @click="viewStudentsInRotation(rotation.code)" 
-                    class="bg-primary-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition shadow-sm btn-hover flex items-center w-full justify-center"
+                    class="bg-primary-600 text-white px-2 py-1 rounded text-xs hover:bg-primary-700 transition shadow-sm hover:shadow"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -904,7 +776,7 @@
               </div>
             </template>
           </div>
-          <div class="mt-6 text-right">
+          <div class="mt-4 text-right">
             <button @click="viewType = 'rotation'" class="text-primary-600 hover:text-primary-800 transition flex items-center ml-auto">
               View all rotations
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -915,43 +787,37 @@
         </div>
 
         <!-- Quick Access -->
-        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-          <h2 class="text-xl font-semibold text-primary-700 mb-6 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="bg-white rounded-lg shadow-md p-4">
+          <h2 class="text-xl font-semibold text-primary-700 mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
             Quick Access
           </h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div @click="viewType = 'calendar'" class="border border-gray-200 rounded-xl p-5 hover:border-primary-500 transition-all cursor-pointer card-hover">
-              <div class="flex items-center mb-3">
-                <div class="bg-primary-100 p-2.5 rounded-lg mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div @click="viewType = 'calendar'" class="border rounded-lg p-4 hover:border-primary-500 transition-all cursor-pointer card-hover">
+              <div class="flex items-center mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
                 <h3 class="text-lg font-semibold">Calendar View</h3>
               </div>
               <p class="text-gray-600">View weekly rotation schedule for all students</p>
             </div>
-            <div @click="viewType = 'student'" class="border border-gray-200 rounded-xl p-5 hover:border-primary-500 transition-all cursor-pointer card-hover">
-              <div class="flex items-center mb-3">
-                <div class="bg-primary-100 p-2.5 rounded-lg mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                </div>
+            <div @click="viewType = 'student'" class="border rounded-lg p-4 hover:border-primary-500 transition-all cursor-pointer card-hover">
+              <div class="flex items-center mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
                 <h3 class="text-lg font-semibold">Student View</h3>
               </div>
               <p class="text-gray-600">View current and upcoming rotations for each student</p>
             </div>
-            <div @click="viewType = 'batch'" class="border border-gray-200 rounded-xl p-5 hover:border-primary-500 transition-all cursor-pointer card-hover">
-              <div class="flex items-center mb-3">
-                <div class="bg-primary-100 p-2.5 rounded-lg mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
-                </div>
+            <div @click="viewType = 'batch'" class="border rounded-lg p-4 hover:border-primary-500 transition-all cursor-pointer card-hover">
+              <div class="flex items-center mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
                 <h3 class="text-lg font-semibold">Batch View</h3>
               </div>
               <p class="text-gray-600">View phase information for each batch</p>
@@ -961,23 +827,23 @@
       </div>
 
       <!-- Schedule Visualization -->
-      <div x-show="viewType !== 'dashboard'" class="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-100">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      <div x-show="viewType !== 'dashboard'" class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold text-primary-700 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
             Schedule Visualization
           </h2>
-          <div x-show="['calendar', 'student', 'rotation'].includes(viewType)" class="flex space-x-2 items-center">
-            <button @click="previousWeek()" class="bg-white border border-gray-300 px-3 py-2 rounded-lg hover:bg-gray-50 transition flex items-center shadow-sm">
+          <div x-show="['calendar', 'student', 'rotation'].includes(viewType)" class="flex space-x-2">
+            <button @click="previousWeek()" class="bg-gray-200 px-3 py-1 rounded-md hover:bg-gray-300 transition flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
               Previous
             </button>
-            <span class="px-4 py-2 bg-primary-50 rounded-lg border border-primary-100 font-medium" x-text="formatDateRange(currentViewStartDate, currentViewEndDate)"></span>
-            <button @click="nextWeek()" class="bg-white border border-gray-300 px-3 py-2 rounded-lg hover:bg-gray-50 transition flex items-center shadow-sm">
+            <span class="px-3 py-1 bg-primary-50 rounded-md" x-text="formatDateRange(currentViewStartDate, currentViewEndDate)"></span>
+            <button @click="nextWeek()" class="bg-gray-200 px-3 py-1 rounded-md hover:bg-gray-300 transition flex items-center">
               Next
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -988,37 +854,28 @@
 
         <!-- Calendar View -->
         <div x-show="viewType === 'calendar'" class="overflow-x-auto">
-          <div x-show="calendarLoading" class="flex justify-center items-center py-16">
-            <div class="flex flex-col items-center">
-              <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-              <p class="text-gray-600">Loading calendar data...</p>
-            </div>
+          <div x-show="calendarLoading" class="flex justify-center items-center py-12">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
           </div>
-          <div x-show="!calendarLoading" class="mb-6">
-            <div class="grid grid-cols-7 gap-3">
-              <div class="calendar-header p-3 text-center rounded-t-md font-semibold">Sun</div>
-              <div class="calendar-header p-3 text-center font-semibold">Mon</div>
-              <div class="calendar-header p-3 text-center font-semibold">Tue</div>
-              <div class="calendar-header p-3 text-center font-semibold">Wed</div>
-              <div class="calendar-header p-3 text-center font-semibold">Thu</div>
-              <div class="calendar-header p-3 text-center font-semibold">Fri</div>
-              <div class="calendar-header p-3 text-center rounded-t-md font-semibold">Sat</div>
+          <div x-show="!calendarLoading" class="mb-4">
+            <div class="grid grid-cols-7 gap-2">
+              <div class="calendar-header p-2 text-center rounded-t-md font-semibold">Sun</div>
+              <div class="calendar-header p-2 text-center font-semibold">Mon</div>
+              <div class="calendar-header p-2 text-center font-semibold">Tue</div>
+              <div class="calendar-header p-2 text-center font-semibold">Wed</div>
+              <div class="calendar-header p-2 text-center font-semibold">Thu</div>
+              <div class="calendar-header p-2 text-center font-semibold">Fri</div>
+              <div class="calendar-header p-2 text-center rounded-t-md font-semibold">Sat</div>
               
               <template x-for="date in getCurrentWeekDates()" :key="date.format('YYYY-MM-DD')">
-                <div :class="`calendar-day border rounded-xl shadow-sm p-4 ${isToday(date) ? 'today' : ''}`">
+                <div :class="`calendar-day border rounded-lg shadow-sm p-3 ${isToday(date) ? 'today' : ''}`">
                   <div class="flex justify-between items-center mb-3 pb-2 border-b">
-                    <span class="font-bold text-xl" x-text="date.format('D')"></span>
-                    <span class="text-xs px-2.5 py-1 bg-primary-100 text-primary-800 rounded-full" x-text="date.format('MMM')"></span>
+                    <span class="font-bold text-lg" x-text="date.format('D')"></span>
+                    <span class="text-xs px-2 py-1 bg-primary-100 text-primary-800 rounded-full" x-text="date.format('MMM')"></span>
                   </div>
                   <div class="space-y-2 max-h-[300px] overflow-y-auto">
                     <template x-for="student in getStudentsForDate(date)" :key="student.id">
-                      <div class="text-xs p-2.5 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all border border-gray-200 shadow-sm calendar-event" :class="{
-                        'border-l-blue-500': student.rotation.startsWith('G') || student.rotation.startsWith('P') || student.rotation.startsWith('C') || student.rotation.startsWith('E'),
-                        'border-l-green-500': student.rotation.startsWith('A') || student.rotation.startsWith('O'),
-                        'border-l-purple-500': student.rotation.startsWith('R') || student.rotation.startsWith('D'),
-                        'border-l-yellow-500': student.rotation.startsWith('Y') || student.rotation.startsWith('F') || student.rotation.startsWith('L') || student.rotation.startsWith('F'),
-                        'border-l-red-500': student.rotation.startsWith('C') || student.rotation.startsWith('P') || student.rotation.startsWith('U') || student.rotation.startsWith('R')
-                      }">
+                      <div class="text-xs p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition-all border border-gray-200 shadow-sm">
                         <div class="font-medium" x-text="student.regdNo"></div>
                         <div class="flex justify-between items-center mt-1">
                           <span class="truncate" x-text="student.name"></span>
@@ -1035,70 +892,55 @@
             </div>
           </div>
           
-          <div x-show="!calendarLoading" class="mt-8">
-            <h3 class="text-lg font-semibold text-primary-700 mb-4 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              Weekly Rotation Summary
-            </h3>
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-              <table class="min-w-full border-collapse">
-                <thead>
-                  <tr class="bg-gray-50 text-left">
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Reg. No.</th>
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Student</th>
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Batch</th>
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Rotation</th>
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Sub-Phase</th>
-                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+          <div x-show="!calendarLoading" class="mt-6">
+            <h3 class="text-lg font-semibold text-primary-700 mb-2">Weekly Rotation Summary</h3>
+            <table class="min-w-full border-collapse">
+              <thead>
+                <tr>
+                  <th class="border px-4 py-2 bg-gray-100">Reg. No.</th>
+                  <th class="border px-4 py-2 bg-gray-100">Student</th>
+                  <th class="border px-4 py-2 bg-gray-100">Batch</th>
+                  <th class="border px-4 py-2 bg-gray-100">Rotation</th>
+                  <th class="border px-4 py-2 bg-gray-100">Sub-Phase</th>
+                  <th class="border px-4 py-2 bg-gray-100">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="student in getFilteredStudents()" :key="student.id">
+                  <tr class="hover:bg-gray-50 transition-all">
+                    <td class="border px-4 py-2 font-medium" x-text="student.regdNo"></td>
+                    <td class="border px-4 py-2" x-text="student.name"></td>
+                    <td class="border px-4 py-2" x-text="student.batch"></td>
+                    <td class="border px-4 py-2">
+                      <template x-if="getStudentRotationForWeek(student.id, currentViewStartDate)">
+                        <div :class="`px-2 py-1 rounded text-xs font-medium ${getRotationColorClass(getStudentRotationForWeek(student.id, currentViewStartDate).rotation)}`" 
+                             x-text="getStudentRotationForWeek(student.id, currentViewStartDate).rotation"></div>
+                      </template>
+                    </td>
+                    <td class="border px-4 py-2">
+                      <template x-if="getStudentRotationForWeek(student.id, currentViewStartDate)">
+                        <span x-text="getRotationName(getStudentRotationForWeek(student.id, currentViewStartDate).rotation)"></span>
+                      </template>
+                    </td>
+                    <td class="border px-4 py-2">
+                      <button @click="viewFullSchedule(student.id)" class="bg-primary-600 text-white px-2 py-1 rounded text-xs hover:bg-primary-700 transition shadow-sm hover:shadow">
+                        View Full Schedule
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  <template x-for="student in getFilteredStudents()" :key="student.id">
-                    <tr class="table-row-hover">
-                      <td class="px-4 py-3 font-medium border-b border-gray-100" x-text="student.regdNo"></td>
-                      <td class="px-4 py-3 border-b border-gray-100" x-text="student.name"></td>
-                      <td class="px-4 py-3 border-b border-gray-100">
-                        <span class="px-2 py-1 bg-gray-100 rounded-md text-xs font-medium" x-text="student.batch"></span>
-                      </td>
-                      <td class="px-4 py-3 border-b border-gray-100">
-                        <template x-if="getStudentRotationForWeek(student.id, currentViewStartDate)">
-                          <div :class="`px-2 py-1 rounded-md text-xs font-medium badge ${getRotationColorClass(getStudentRotationForWeek(student.id, currentViewStartDate).rotation)}`" 
-                               x-text="getStudentRotationForWeek(student.id, currentViewStartDate).rotation"></div>
-                        </template>
-                      </td>
-                      <td class="px-4 py-3 border-b border-gray-100">
-                        <template x-if="getStudentRotationForWeek(student.id, currentViewStartDate)">
-                          <span x-text="getRotationName(getStudentRotationForWeek(student.id, currentViewStartDate).rotation)"></span>
-                        </template>
-                      </td>
-                      <td class="px-4 py-3 border-b border-gray-100">
-                        <button @click="viewFullSchedule(student.id)" class="bg-primary-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-primary-700 transition shadow-sm btn-hover flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                          </svg>
-                          View Full Schedule
-                        </button>
-                      </td>
-                    </tr>
-                  </template>
-                </tbody>
-              </table>
-            </div>
+                </template>
+              </tbody>
+            </table>
           </div>
         </div>
 
         <!-- Student View -->
         <div x-show="viewType === 'student'" class="overflow-x-auto">
-          <div x-show="studentViewLoading" class="flex justify-center items-center py-16">
-            <div class="flex flex-col items-center">
-              <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-              <p class="text-gray-600">Loading student data...</p>
-            </div>
+          <div x-show="studentViewLoading" class="flex justify-center items-center py-12">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
           </div>
           
-          <div x-show="!studentViewLoading" class="mb-6">
+          <div x-show="!studentViewLoading" class="mb-4">
             <div class="relative mb-6">
               <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1109,10 +951,10 @@
                 type="text" 
                 x-model="studentListSearch" 
                 placeholder="Search by name or registration number" 
-                class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all shadow-sm"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all shadow-sm"
               >
               <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                <div x-show="studentListSearch.length > 0" @click="studentListSearch = ''" class="cursor-pointer text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100">
+                <div x-show="studentListSearch.length > 0" @click="studentListSearch = ''" class="cursor-pointer text-gray-400 hover:text-gray-600">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -1133,203 +975,164 @@
             </template>
           </div>
           
-          <div x-show="!studentViewLoading" class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-            <table class="min-w-full border-collapse">
-              <thead>
-                <tr class="bg-gray-50 text-left">
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Reg. No.</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Student</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Batch</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Current Rotation</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Start Date</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">End Date</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Next Rotation</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+          <table x-show="!studentViewLoading" class="min-w-full border-collapse">
+            <thead>
+              <tr>
+                <th class="border px-4 py-2 bg-gray-100">Reg. No.</th>
+                <th class="border px-4 py-2 bg-gray-100">Student</th>
+                <th class="border px-4 py-2 bg-gray-100">Batch</th>
+                <th class="border px-4 py-2 bg-gray-100">Current Rotation</th>
+                <th class="border px-4 py-2 bg-gray-100">Start Date</th>
+                <th class="border px-4 py-2 bg-gray-100">End Date</th>
+                <th class="border px-4 py-2 bg-gray-100">Next Rotation</th>
+                <th class="border px-4 py-2 bg-gray-100">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="student in filteredStudents" :key="student.id">
+                <tr class="hover:bg-gray-50 transition-all">
+                  <td class="border px-4 py-2 font-medium" x-text="student.regdNo"></td>
+                  <td class="border px-4 py-2" x-text="student.name"></td>
+                  <td class="border px-4 py-2" x-text="student.batch"></td>
+                  <td class="border px-4 py-2">
+                    <div :class="`px-2 py-1 rounded text-xs font-medium inline-block ${getRotationColorClass(getCurrentRotationForStudent(student.id).rotation)}`" 
+                         x-text="getCurrentRotationForStudent(student.id).rotation"></div>
+                  </td>
+                  <td class="border px-4 py-2" x-text="formatDate(getCurrentRotationForStudent(student.id).startDate)"></td>
+                  <td class="border px-4 py-2" x-text="formatDate(getCurrentRotationForStudent(student.id).endDate)"></td>
+                  <td class="border px-4 py-2">
+                    <template x-if="getNextRotationForStudent(student.id)">
+                      <div :class="`px-2 py-1 rounded text-xs font-medium inline-block ${getRotationColorClass(getNextRotationForStudent(student.id).rotation)}`
+                         x-text="getNextRotationForStudent(student.id).rotation"></div>
+                    </template>
+                    <template x-if="!getNextRotationForStudent(student.id)">
+                      <span class="text-gray-500">None</span>
+                    </template>
+                  </td>
+                  <td class="border px-4 py-2">
+                    <button @click="viewFullSchedule(student.id)" class="bg-primary-600 text-white px-2 py-1 rounded text-xs hover:bg-primary-700 transition shadow-sm hover:shadow">
+                      View Full Schedule
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                <template x-for="student in filteredStudents" :key="student.id">
-                  <tr class="table-row-hover">
-                    <td class="px-4 py-3 font-medium border-b border-gray-100" x-text="student.regdNo"></td>
-                    <td class="px-4 py-3 border-b border-gray-100" x-text="student.name"></td>
-                    <td class="px-4 py-3 border-b border-gray-100">
-                      <span class="px-2 py-1 bg-gray-100 rounded-md text-xs font-medium" x-text="student.batch"></span>
-                    </td>
-                    <td class="px-4 py-3 border-b border-gray-100">
-                      <div :class="`px-2 py-1 rounded-md text-xs font-medium badge ${getRotationColorClass(getCurrentRotationForStudent(student.id).rotation)}`" 
-                           x-text="getCurrentRotationForStudent(student.id).rotation"></div>
-                    </td>
-                    <td class="px-4 py-3 border-b border-gray-100" x-text="formatDate(getCurrentRotationForStudent(student.id).startDate)"></td>
-                    <td class="px-4 py-3 border-b border-gray-100" x-text="formatDate(getCurrentRotationForStudent(student.id).endDate)"></td>
-                    <td class="px-4 py-3 border-b border-gray-100">
-                      <template x-if="getNextRotationForStudent(student.id)">
-                        <div :class="`px-2 py-1 rounded-md text-xs font-medium badge ${getRotationColorClass(getNextRotationForStudent(student.id).rotation)}`
-                           x-text="getNextRotationForStudent(student.id).rotation"></div>
-                      </template>
-                      <template x-if="!getNextRotationForStudent(student.id)">
-                        <span class="text-gray-500">None</span>
-                      </template>
-                    </td>
-                    <td class="px-4 py-3 border-b border-gray-100">
-                      <button @click="viewFullSchedule(student.id)" class="bg-primary-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-primary-700 transition shadow-sm btn-hover flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        View Full Schedule
-                      </button>
-                    </td>
-                  </tr>
-                </template>
-              </tbody>
-            </table>
-          </div>
+              </template>
+            </tbody>
+          </table>
         </div>
 
         <!-- Rotation View -->
         <div x-show="viewType === 'rotation'" class="overflow-x-auto">
-          <div x-show="rotationViewLoading" class="flex justify-center items-center py-16">
-            <div class="flex flex-col items-center">
-              <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-              <p class="text-gray-600">Loading rotation data...</p>
-            </div>
+          <div x-show="rotationViewLoading" class="flex justify-center items-center py-12">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
           </div>
-          <div x-show="!rotationViewLoading" class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-            <table class="min-w-full border-collapse">
-              <thead>
-                <tr class="bg-gray-50 text-left">
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Rotation</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Phase</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Current Students</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Start Date</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">End Date</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <template x-for="rotation in getAllRotations()" :key="rotation.id">
-                  <tr class="table-row-hover">
-                    <td class="px-4 py-3 border-b border-gray-100">
-                      <div class="flex items-center">
-                        <div :class="`px-2 py-1 rounded-md text-xs font-medium inline-block badge ${getRotationColorClass(rotation.code)}`" 
-                             x-text="rotation.code"></div>
-                        <span class="ml-2" x-text="rotation.name"></span>
+          <table x-show="!rotationViewLoading" class="min-w-full border-collapse">
+            <thead>
+              <tr>
+                <th class="border px-4 py-2 bg-gray-100">Rotation</th>
+                <th class="border px-4 py-2 bg-gray-100">Phase</th>
+                <th class="border px-4 py-2 bg-gray-100">Current Students</th>
+                <th class="border px-4 py-2 bg-gray-100">Start Date</th>
+                <th class="border px-4 py-2 bg-gray-100">End Date</th>
+                <th class="border px-4 py-2 bg-gray-100">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="rotation in getAllRotations()" :key="rotation.id">
+                <tr class="hover:bg-gray-50 transition-all">
+                  <td class="border px-4 py-2">
+                    <div class="flex items-center">
+                      <div :class="`px-2 py-1 rounded text-xs font-medium inline-block ${getRotationColorClass(rotation.code)}`" 
+                           x-text="rotation.code"></div>
+                      <span class="ml-2" x-text="rotation.name"></span>
+                    </div>
+                  </td>
+                  <td class="border px-4 py-2" x-text="rotation.phase"></td>
+                  <td class="border px-4 py-2">
+                    <template x-if="rotation.studentCount > 0">
+                      <div class="flex flex-wrap gap-1">
+                        <template x-for="(student, index) in getStudentsInRotation(rotation.code).slice(0, 3)" :key="student.id">
+                          <span class="bg-gray-200 px-2 py-1 rounded text-xs tooltip">
+                            <span x-text="student.regdNo"></span>
+                            <span class="tooltip-text" x-text="student.name"></span>
+                          </span>
+                        </template>
+                        <template x-if="getStudentsInRotation(rotation.code).length > 3">
+                          <span class="bg-gray-200 px-2 py-1 rounded text-xs">
+                            +<span x-text="getStudentsInRotation(rotation.code).length - 3"></span> more
+                          </span>
+                        </template>
                       </div>
-                    </td>
-                    <td class="px-4 py-3 border-b border-gray-100" x-text="rotation.phase"></td>
-                    <td class="px-4 py-3 border-b border-gray-100">
-                      <template x-if="rotation.studentCount > 0">
-                        <div class="flex flex-wrap gap-1">
-                          <template x-for="(student, index) in getStudentsInRotation(rotation.code).slice(0, 3)" :key="student.id">
-                            <span class="bg-gray-100 px-2 py-1 rounded-md text-xs tooltip">
-                              <span x-text="student.regdNo"></span>
-                              <span class="tooltip-text" x-text="student.name"></span>
-                            </span>
-                          </template>
-                          <template x-if="getStudentsInRotation(rotation.code).length > 3">
-                            <span class="bg-gray-100 px-2 py-1 rounded-md text-xs">
-                              +<span x-text="getStudentsInRotation(rotation.code).length - 3"></span> more
-                            </span>
-                          </template>
-                        </div>
-                      </template>
-                      <template x-if="rotation.studentCount === 0">
-                        <span class="text-gray-500 italic">No students currently assigned</span>
-                      </template>
-                    </td>
-                    <td class="px-4 py-3 border-b border-gray-100" x-text="formatDate(rotation.startDate)"></td>
-                    <td class="px-4 py-3 border-b border-gray-100" x-text="formatDate(rotation.endDate)"></td>
-                    <td class="px-4 py-3 border-b border-gray-100">
-                      <button 
-                        @click="viewStudentsInRotation(rotation.code)" 
-                        class="bg-primary-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-primary-700 transition shadow-sm btn-hover flex items-center"
-                        :disabled="rotation.studentCount === 0"
-                        :class="{'opacity-50 cursor-not-allowed': rotation.studentCount === 0}"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 
-html file="index-part2.html"
-0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        View Students
-                      </button>
-                    </td>
-                  </tr>
-                </template>
-              </tbody>
-            </table>
-          </div>
+                    </template>
+                    <template x-if="rotation.studentCount === 0">
+                      <span class="text-gray-500 italic">No students currently assigned</span>
+                    </template>
+                  </td>
+                  <td class="border px-4 py-2" x-text="formatDate(rotation.startDate)"></td>
+                  <td class="border px-4 py-2" x-text="formatDate(rotation.endDate)"></td>
+                  <td class="border px-4 py-2">
+                    <button 
+                      @click="viewStudentsInRotation(rotation.code)" 
+                      class="bg-primary-600 text-white px-2 py-1 rounded text-xs hover:bg-primary-700 transition shadow-sm hover:shadow"
+                      :disabled="rotation.studentCount === 0"
+                      :class="{'opacity-50 cursor-not-allowed': rotation.studentCount === 0}"
+                    >
+                      View Students
+                    </button>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
         </div>
 
         <!-- Batch View -->
         <div x-show="viewType === 'batch'" class="overflow-x-auto">
-          <div x-show="batchViewLoading" class="flex justify-center items-center py-16">
-            <div class="flex flex-col items-center">
-              <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-              <p class="text-gray-600">Loading batch data...</p>
-            </div>
+          <div x-show="batchViewLoading" class="flex justify-center items-center py-12">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
           </div>
-          <div x-show="!batchViewLoading" class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-            <table class="min-w-full border-collapse">
-              <thead>
-                <tr class="bg-gray-50 text-left">
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Batch</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Current Phase</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Students</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Start Date</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">End Date</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Next Phase</th>
-                  <th class="px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+          <table x-show="!batchViewLoading" class="min-w-full border-collapse">
+            <thead>
+              <tr>
+                <th class="border px-4 py-2 bg-gray-100">Batch</th>
+                <th class="border px-4 py-2 bg-gray-100">Current Phase</th>
+                <th class="border px-4 py-2 bg-gray-100">Students</th>
+                <th class="border px-4 py-2 bg-gray-100">Start Date</th>
+                <th class="border px-4 py-2 bg-gray-100">End Date</th>
+                <th class="border px-4 py-2 bg-gray-100">Next Phase</th>
+                <th class="border px-4 py-2 bg-gray-100">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="batch in ['A', 'B', 'C', 'D']" :key="batch">
+                <tr class="hover:bg-gray-50 transition-all">
+                  <td class="border px-4 py-2 font-medium" x-text="`Batch ${batch}`"></td>
+                  <td class="border px-4 py-2" x-text="getCurrentPhaseForBatch(batch).phase"></td>
+                  <td class="border px-4 py-2" x-text="getStudentCountInBatch(batch)"></td>
+                  <td class="border px-4 py-2" x-text="formatDate(getCurrentPhaseForBatch(batch).startDate)"></td>
+                  <td class="border px-4 py-2" x-text="formatDate(getCurrentPhaseForBatch(batch).endDate)"></td>
+                  <td class="border px-4 py-2" x-text="getNextPhaseForBatch(batch) ? getNextPhaseForBatch(batch).phase : 'None'"></td>
+                  <td class="border px-4 py-2">
+                    <button 
+                      @click="viewBatchStudents(batch)" 
+                      class="bg-primary-600 text-white px-2 py-1 rounded text-xs hover:bg-primary-700 transition shadow-sm hover:shadow"
+                    >
+                      View Students
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                <template x-for="batch in ['A', 'B', 'C', 'D']" :key="batch">
-                  <tr class="table-row-hover">
-                    <td class="px-4 py-3 font-medium border-b border-gray-100">
-                      <div class="flex items-center">
-                        <span class="w-3 h-3 rounded-full mr-2" :class="{
-                          'bg-blue-500': batch === 'A',
-                          'bg-green-500': batch === 'B',
-                          'bg-purple-500': batch === 'C',
-                          'bg-yellow-500': batch === 'D'
-                        }"></span>
-                        <span x-text="`Batch ${batch}`"></span>
-                      </div>
-                    </td>
-                    <td class="px-4 py-3 border-b border-gray-100" x-text="getCurrentPhaseForBatch(batch).phase"></td>
-                    <td class="px-4 py-3 border-b border-gray-100">
-                      <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-md text-xs font-medium" x-text="getStudentCountInBatch(batch)"></span>
-                    </td>
-                    <td class="px-4 py-3 border-b border-gray-100" x-text="formatDate(getCurrentPhaseForBatch(batch).startDate)"></td>
-                    <td class="px-4 py-3 border-b border-gray-100" x-text="formatDate(getCurrentPhaseForBatch(batch).endDate)"></td>
-                    <td class="px-4 py-3 border-b border-gray-100" x-text="getNextPhaseForBatch(batch) ? getNextPhaseForBatch(batch).phase : 'None'"></td>
-                    <td class="px-4 py-3 border-b border-gray-100">
-                      <button 
-                        @click="viewBatchStudents(batch)" 
-                        class="bg-primary-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-primary-700 transition shadow-sm btn-hover flex items-center"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        View Students
-                      </button>
-                    </td>
-                  </tr>
-                </template>
-              </tbody>
-            </table>
-          </div>
+              </template>
+            </tbody>
+          </table>
         </div>
       </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gradient-to-r from-primary-800 to-primary-950 text-white py-8 mt-8">
+    <footer class="bg-gradient-to-r from-primary-800 to-primary-950 text-white py-6 mt-8">
       <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
           <div class="flex items-center mb-4 md:mb-0">
-            <div class="bg-white p-1.5 rounded-full mr-3 w-12 h-12 flex items-center justify-center shadow-md">
+            <div class="bg-white p-1 rounded-full mr-3 w-12 h-12 flex items-center justify-center">
               <img src="https://gimsr.gitam.edu/Images/gimsr-image-ivory.svg" alt="Logo" class="rounded-full" />
             </div>
             <div>
@@ -1341,20 +1144,20 @@ html file="index-part2.html"
             <p class="text-sm">Developed and managed by 
               <a href="https:/jaswanthmadiya.tech" target="_blank" class="font-bold hover:underline">Madiya Jaswanth</a>
             </p>
-            <p class="text-xs text-primary-100 mt-1">Version 2.0</p>
+            <!-- <p class="text-xs text-primary-100 mt-1">Version 2.0</p> -->
           </div>
         </div>
       </div>
     </footer>
 
     <!-- Export Loading Modal -->
-    <div x-show="showExportLoadingModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm">
-      <div class="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center max-w-md w-full transform transition-all">
-        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-14 w-14 mb-5"></div>
-        <h2 class="text-2xl font-bold text-primary-700 mb-3">Preparing Your Data</h2>
-        <p class="text-gray-600 text-center mb-6">Please wait while we format and prepare your data for export...</p>
-        <div class="w-full bg-gray-200 rounded-full h-2">
-          <div class="bg-primary-600 h-2 rounded-full animate-pulse-slow" style="width: 100%"></div>
+    <div x-show="showExportLoadingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center max-w-md w-full">
+        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+        <h2 class="text-xl font-semibold text-primary-700 mb-2">Preparing Your Data</h2>
+        <p class="text-gray-600 text-center mb-4">Please wait while we format and prepare your data for export...</p>
+        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+          <div class="bg-primary-600 h-2.5 rounded-full animate-pulse-slow" style="width: 100%"></div>
         </div>
       </div>
     </div>
@@ -2695,5 +2498,3 @@ html file="index-part2.html"
   </script>
 </body>
 </html>
-
- 

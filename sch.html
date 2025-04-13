@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Rotation Scheduler</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js for reactivity -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Date-fns for date handling -->
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #14b8a6;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0d9488;
+        }
+        
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-break {
+                page-break-before: always;
+            }
+            body {
+                font-size: 12px;
+            }
+            .print-container {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        }
+        
+        /* Animation for loading */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Cell highlighting */
+        .cell-highlight {
+            position: relative;
+        }
+        .cell-highlight:hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(20, 184, 166, 0.2);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen" x-data="scheduler()">
+    <!-- Loading Overlay -->
+    <div x-show="loading" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center max-w-md w-full">
+            <div class="relative w-24 h-24 mb-6">
+                <div class="absolute inset-0 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <img src="https://gimsr.gitam.edu/Images/gimsr-image-ivory.svg" alt="Logo" class="w-14 h-14 rounded-full">
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-teal-700 mb-3">Medical Rotation Scheduler</h2>
+            <p class="text-gray-600 text-center mb-6" x-text="loadingStage"></p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                <div class="h-full bg-teal-600 rounded-full" :style="`width: ${loadingProgress}%`"></div>
+            </div>
+            <p class="text-xs text-gray-500" x-text="`${Math.round(loadingProgress)}% complete`"></p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-teal-800 to-teal-950 text-white shadow-lg sticky top-0 z-30 no-print">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-3 md:mb-0">
+                    <div class="bg-white p-1.5 rounded-full mr-3 w-12 h-12 flex items-center justify-center shadow-md">
+                        <img src="https://gimsr.gitam.edu/Images/gimsr-image-ivory.svg" alt="Logo" class="rounded-full">
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Medical Rotation Scheduler</h1>
+                        <p class="text-xs text-teal-100">Streamline your medical rotation management</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <div class="relative group">
+                        <button @click="isExportOptionsOpen = !isExportOptionsOpen" class="bg-white text-teal-800 px-4 py-2 rounded-md shadow-md flex items-center">
+                            <i class="fas fa-download mr-2"></i>
+                            Export
+                            <i class="fas fa-chevron-down ml-2"></i>
+                        </button>
+                        <div x-show="isExportOptionsOpen" @click.away="isExportOptionsOpen = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                            <div class="py-1">
+                                <a href="#" @click.prevent="exportToCSV()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-100">
+                                    <i class="fas fa-file-csv mr-2"></i> Export to CSV
+                                </a>
+                                <a href="#" @click.prevent="printSchedule()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-100">
+                                    <i class="fas fa-print mr-2"></i> Print Schedule
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button @click="isHelpOpen = true" class="bg-white/10 text-white border border-white/20 hover:bg-white/20 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6 flex-grow">
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6 no-print">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-teal-700 flex items-center">
+                    <i class="fas fa-filter mr-2"></i>
+                    Filters
+                </h2>
+                <div class="flex items-center gap-2">
+                    <div class="relative group">
+                        <button @click="isSavedFiltersOpen = !isSavedFiltersOpen" class="border border-gray-300 px-3 py-1.5 rounded-md flex items-center text-sm">
+                            <i class="fas fa-bookmark mr-2"></i>
+                            Saved Filters
+                        </button>
+                        <div x-show="isSavedFiltersOpen" @click.away="isSavedFiltersOpen = false" class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-10">
+                            <div class="py-1">
+                                <div class="px-4 py-2 text-sm font-medium text-gray-700 border-b">Saved Filters</div>
+                                <template x-if="savedFilters.length > 0">
+                                    <div>
+                                        <template x-for="filter in savedFilters" :key="filter.id">
+                                            <div class="flex justify-between items-center px-4 py-2 hover:bg-gray-100">
+                                                <a href="#" @click.prevent="applySavedFilter(filter)" class="text-sm text-gray-700 flex items-center">
+                                                    <i class="fas fa-bookmark mr-2 text-teal-600"></i>
+                                                    <span x-text="filter.name"></span>
+                                                </a>
+                                                <button @click="deleteSavedFilter(filter.id)" class="text-gray-500 hover:text-red-500">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                                <template x-if="savedFilters.length === 0">
+                                    <div class="px-4 py-2 text-sm text-gray-500 italic">No saved filters</div>
+                                </template>
+                                <div class="border-t mt-1"></div>
+                                <a href="#" @click.prevent="openSaveFilterModal()" class="block px-4 py-2 text-sm text-teal-600 hover:bg-teal-50">
+                                    <i class="fas fa-plus mr-2"></i> Save Current Filter
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button @click="showFilters = !showFilters" class="text-teal-700">
+                        <i :class="showFilters ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div x-show="showFilters" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform -translate-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Batch</label>
+                        <select x-model="filters.batch" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                            <option value="all">All Batches</option>
+                            <option value="A">Batch A</option>
+                            <option value="B">Batch B</option>
+                            <option value="C">Batch C</option>
+                            <option value="D">Batch D</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phase</label>
+                        <select x-model="filters.phase" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                            <option value="all">All Phases</option>
+                            <option value="M">Medicine</option>
+                            <option value="S">Surgery</option>
+                            <option value="O">OBGY</option>
+                            <option value="Misc">Misc</option>
+                            <option value="CM">Community Medicine</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Week Range</label>
+                        <div class="flex space-x-2">
+                            <input type="number" x-model="filters.startWeek" min="1" max="52" placeholder="Start Week" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                            <input type="number" x-model="filters.endWeek" min="1" max="52" placeholder="End Week" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Student</label>
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" x-model="searchQuery" placeholder="Search by name or reg. no." class="w-full border border-gray-300 rounded-md pl-10 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                            <i x-show="searchQuery" @click="searchQuery = ''" class="fas fa-times absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Rotation</label>
+                        <select x-model="filters.rotation" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                            <option value="all">All Rotations</option>
+                            <template x-for="rotation in rotations" :key="rotation.code">
+                                <option :value="rotation.code" x-text="`${rotation.code} - ${rotation.name}`"></option>
+                            </template>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Current Week</label>
+                        <div class="flex space-x-2">
+                            <input type="number" x-model="currentWeek" min="1" max="52" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                            <button @click="setCurrentWeek()" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700 transition-colors">Set</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <button @click="applyFilters()" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700 transition-colors flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Apply Filters
+                    </button>
+                    <button @click="resetFilters()" class="border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors flex items-center">
+                        <i class="fas fa-redo mr-2"></i>
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend Section -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold text-teal-700 flex items-center mb-4">
+                <i class="fas fa-info-circle mr-2"></i>
+                Legend
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center text-blue-800 font-bold text-xs mr-2">GM</div>
+                    <span class="text-sm">General Medicine</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center text-blue-800 font-bold text-xs mr-2">PY</div>
+                    <span class="text-sm">Psychiatry</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center text-blue-800 font-bold text-xs mr-2">CA</div>
+                    <span class="text-sm">Casualty</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center text-blue-800 font-bold text-xs mr-2">EN</div>
+                    <span class="text-sm">ENT</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-green-100 rounded-md flex items-center justify-center text-green-800 font-bold text-xs mr-2">GS</div>
+                    <span class="text-sm">General Surgery</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-green-100 rounded-md flex items-center justify-center text-green-800 font-bold text-xs mr-2">AN</div>
+                    <span class="text-sm">Anesthesia</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-green-100 rounded-md flex items-center justify-center text-green-800 font-bold text-xs mr-2">OR</div>
+                    <span class="text-sm">Orthopedics</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-green-100 rounded-md flex items-center justify-center text-green-800 font-bold text-xs mr-2">OP</div>
+                    <span class="text-sm">Ophthalmology</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-purple-100 rounded-md flex items-center justify-center text-purple-800 font-bold text-xs mr-2">OB</div>
+                    <span class="text-sm">Obstetrics</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-purple-100 rounded-md flex items-center justify-center text-purple-800 font-bold text-xs mr-2">PE</div>
+                    <span class="text-sm">Pediatrics</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-purple-100 rounded-md flex items-center justify-center text-purple-800 font-bold text-xs mr-2">RM</div>
+                    <span class="text-sm">Respiratory Medicine</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-purple-100 rounded-md flex items-center justify-center text-purple-800 font-bold text-xs mr-2">RA</div>
+                    <span class="text-sm">Radiology</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-purple-100 rounded-md flex items-center justify-center text-purple-800 font-bold text-xs mr-2">DE</div>
+                    <span class="text-sm">Dermatology</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-yellow-100 rounded-md flex items-center justify-center text-yellow-800 font-bold text-xs mr-2">YO</div>
+                    <span class="text-sm">YO</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-yellow-100 rounded-md flex items-center justify-center text-yellow-800 font-bold text-xs mr-2">FP</div>
+                    <span class="text-sm">FP</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-yellow-100 rounded-md flex items-center justify-center text-yellow-800 font-bold text-xs mr-2">LM</div>
+                    <span class="text-sm">LM</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-yellow-100 rounded-md flex items-center justify-center text-yellow-800 font-bold text-xs mr-2">FM</div>
+                    <span class="text-sm">FM</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-red-100 rounded-md flex items-center justify-center text-red-800 font-bold text-xs mr-2">CH</div>
+                    <span class="text-sm">Community Health</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-red-100 rounded-md flex items-center justify-center text-red-800 font-bold text-xs mr-2">PH</div>
+                    <span class="text-sm">Public Health</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-red-100 rounded-md flex items-center justify-center text-red-800 font-bold text-xs mr-2">UH</div>
+                    <span class="text-sm">Urban Health</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-red-100 rounded-md flex items-center justify-center text-red-800 font-bold text-xs mr-2">RH</div>
+                    <span class="text-sm">Rural Health</span>
+                </div>
+            </div>
+            
+            <div class="mt-6 border-t pt-4">
+                <h3 class="font-semibold text-gray-700 mb-2">Phase Color Coding</h3>
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-blue-500 rounded-full mr-2"></div>
+                        <span class="text-sm">Medicine (M)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
+                        <span class="text-sm">Surgery (S)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-purple-500 rounded-full mr-2"></div>
+                        <span class="text-sm">OBGY (O)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-yellow-500 rounded-full mr-2"></div>
+                        <span class="text-sm">Misc</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
+                        <span class="text-sm">Community Medicine (CM)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Grid -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6 overflow-x-auto">
+            <h2 class="text-xl font-semibold text-teal-700 flex items-center mb-4">
+                <i class="fas fa-calendar-alt mr-2"></i>
+                Rotation Schedule
+            </h2>
+            
+            <div class="min-w-max">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="px-2 py-3 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider sticky left-0 z-10">Student</th>
+                            <template x-for="week in 52" :key="week">
+                                <th class="px-2 py-3 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-10" :class="{'bg-teal-100': week == currentWeek}">
+                                    <div x-text="week"></div>
+                                </th>
+                            </template>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(student, index) in filteredStudents" :key="student.id">
+                            <tr :class="{'bg-gray-50': index % 2 === 0}">
+                                <td class="px-2 py-3 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 z-10" :class="{'bg-gray-50': index % 2 === 0, 'bg-white': index % 2 !== 0}">
+                                    <div class="flex items-center">
+                                        <span x-text="student.id"></span>
+                                    </div>
+                                </td>
+                                <template x-for="week in 52" :key="week">
+                                    <td class="px-0 py-1 text-center text-xs border border-gray-200 cell-highlight" :class="{'bg-teal-50': week == currentWeek}">
+                                        <div class="tooltip">
+                                            <div x-html="getRotationForStudentWeek(student.id, week)" class="w-full h-full flex items-center justify-center"></div>
+                                            <span class="tooltip-text" x-text="getRotationTooltip(student.id, week)"></span>
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-teal-800 to-teal-950 text-white py-8 mt-8 no-print">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <div class="bg-white p-1.5 rounded-full mr-3 w-12 h-12 flex items-center justify-center shadow-md">
+                        <img src="https://gimsr.gitam.edu/Images/gimsr-image-ivory.svg" alt="Logo" class="rounded-full">
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold">Medical Rotation Scheduler</h2>
+                        <p class="text-xs text-teal-100">© 2025 All Rights Reserved</p>
+                    </div>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-sm">
+                        Developed and managed by
+                        <a href="https://jaswanthmadiya.tech" target="_blank" class="font-bold hover:underline ml-1">
+                            Madiya Jaswanth
+                        </a>
+                    </p>
+                    <p class="text-xs text-teal-100 mt-1">Version 2.0</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Save Filter Modal -->
+    <div x-show="isSaveFilterOpen" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 no-print" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click.away="isSaveFilterOpen = false">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Save Filter</h3>
+            <div class="mb-4">
+                <label for="filter-name" class="block text-sm font-medium text-gray-700 mb-1">Filter Name</label>
+                <input type="text" id="filter-name" x-model="saveFilterName" placeholder="Enter a name for this filter" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+            </div>
+            <div class="mb-4">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">Current Filter Settings</h4>
+                <div class="bg-gray-50 rounded-md p-3 text-sm">
+                    <p><strong>Batch:</strong> <span x-text="filters.batch === 'all' ? 'All Batches' : `Batch ${filters.batch}`"></span></p>
+                    <p><strong>Phase:</strong> <span x-text="filters.phase === 'all' ? 'All Phases' : getPhaseName(filters.phase)"></span></p>
+                    <p><strong>Rotation:</strong> <span x-text="filters.rotation === 'all' ? 'All Rotations' : filters.rotation"></span></p>
+                    <p><strong>Week Range:</strong> <span x-text="filters.startWeek && filters.endWeek ? `Week ${filters.startWeek} to Week ${filters.endWeek}` : 'No week range selected'"></span></p>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button @click="isSaveFilterOpen = false" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
+                <button @click="saveCurrentFilter()" class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700">Save Filter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div x-show="isHelpOpen" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 no-print" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click.away="isHelpOpen = false">
+        <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full p-6 max-h-[80vh] overflow-y-auto">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Help & Documentation</h3>
+            <div class="space-y-6">
+                <div class="rounded-lg border p-4">
+                    <h4 class="text-md font-semibold mb-2">Getting Started</h4>
+                    <p class="text-sm text-gray-600 mb-2">
+                        The Medical Rotation Scheduler helps you manage and track student rotations across different medical departments.
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        The schedule grid shows students (rows) and their assigned rotations across 52 weeks (columns). Each cell contains a rotation code that corresponds to a specific department or specialty.
+                    </p>
+                </div>
+
+                <div class="rounded-lg border p-4">
+                    <h4 class="text-md font-semibold mb-2">Using Filters</h4>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Filters allow you to narrow down the data displayed in the schedule grid:
+                    </p>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                        <li>Batch - Show students from a specific batch (A, B, C, D)</li>
+                        <li>Phase - Filter by medical phase (Medicine, Surgery, etc.)</li>
+                        <li>Rotation - Show specific rotations only</li>
+                        <li>Week Range - Filter by specific weeks in the year</li>
+                    </ul>
+                    <p class="text-sm text-gray-600 mt-2">
+                        You can save frequently used filters for quick access later.
+                    </p>
+                </div>
+
+                <div class="rounded-lg border p-4">
+                    <h4 class="text-md font-semibold mb-2">Legend</h4>
+                    <p class="text-sm text-gray-600">
+                        The legend section explains the meaning of each rotation code and the color coding used in the schedule. Hover over any cell in the schedule grid to see more details about that rotation.
+                    </p>
+                </div>
+
+                <div class="rounded-lg border p-4">
+                    <h4 class="text-md font-semibold mb-2">Exporting Data</h4>
+                    <p class="text-sm text-gray-600 mb-2">You can export data in several formats:</p>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                        <li>CSV - For spreadsheet applications</li>
+                        <li>Print - Print the current view of the schedule</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button @click="isHelpOpen = false" class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function scheduler() {
+            return {
+                loading: true,
+                loadingProgress: 0,
+                loadingStage: "Initializing...",
+                showFilters: true,
+                isExportOptionsOpen: false,
+                isHelpOpen: false,
+                isSavedFiltersOpen: false,
+                isSaveFilterOpen: false,
+                saveFilterName: "",
+                searchQuery: "",
+                currentWeek: 1,
+                
+                filters: {
+                    batch: "all",
+                    phase: "all",
+                    rotation: "all",
+                    startWeek: "",
+                    endWeek: ""
+                },
+                
+                savedFilters: [],
+                students: [],
+                rotations: [],
+                schedule: [],
+                
+                // Initialize the application
+                init() {
+                    this.loadData();
+                    
+                    // Load saved filters from localStorage if available
+                    const savedFiltersFromStorage = localStorage.getItem("savedFilters");
+                    if (savedFiltersFromStorage) {
+                        this.savedFilters = JSON.parse(savedFiltersFromStorage);
+                    }
+                },
+                
+                // Load data
+                loadData() {
+                    // Simulate loading stages
+                    const stages = [
+                        { message: "Initializing...", duration: 500 },
+                        { message: "Loading student data...", duration: 700 },
+                        { message: "Setting up rotations...", duration: 600 },
+                        { message: "Preparing schedule...", duration: 800 },
+                        { message: "Almost ready...", duration: 400 }
+                    ];
+                    
+                    let totalDuration = 0;
+                    stages.forEach(stage => totalDuration += stage.duration);
+                    
+                    let elapsed = 0;
+                    stages.forEach((stage, index) => {
+                        setTimeout(() => {
+                            this.loadingStage = stage.message;
+                        }, elapsed);
+                        
+                        const startProgress = (elapsed / totalDuration) * 100;
+                        const endProgress = ((elapsed + stage.duration) / totalDuration) * 100;
+                        
+                        const progressInterval = setInterval(() => {
+                            this.loadingProgress += 1;
+                            if (this.loadingProgress >= endProgress) {
+                                clearInterval(progressInterval);
+                            }
+                        }, stage.duration / (endProgress - startProgress));
+                        
+                        elapsed += stage.duration;
+                    });
+                    
+                    // Complete loading and initialize data
+                    setTimeout(() => {
+                        this.initializeData();
+                        this.loading = false;
+                    }, totalDuration + 300);
+                },
+                
+                // Initialize data with the provided schedule
+                initializeData() {
+                    // Define rotations
+                    this.rotations = [
+                        { code: "GM", name: "General Medicine", phase: "M" },
+                        { code: "PY", name: "Psychiatry", phase: "M" },
+                        { code: "CA", name: "Casualty", phase: "M" },
+                        { code: "EN", name: "ENT", phase: "M" },
+                        { code: "GS", name: "General Surgery", phase: "S" },
+                        { code: "AN", name: "Anesthesia", phase: "S" },
+                        { code: "OR", name: "Orthopedics", phase: "S" },
+                        { code: "OP", name: "Ophthalmology", phase: "S" },
+                        { code: "OB", name: "Obstetrics", phase: "O" },
+                        { code: "PE", name: "Pediatrics", phase: "O" },
+                        { code: "RM", name: "Respiratory Medicine", phase: "O" },
+                        { code: "RA", name: "Radiology", phase: "O" },
+                        { code: "DE", name: "Dermatology", phase: "O" },
+                        { code: "YO", name: "YO", phase: "Misc" },
+                        { code: "FP", name: "FP", phase: "Misc" },
+                        { code: "LM", name: "LM", phase: "Misc" },
+                        { code: "FM", name: "FM", phase: "Misc" },
+                        { code: "CH", name: "Community Health", phase: "CM" },
+                        { code: "PH", name: "Public Health", phase: "CM" },
+                        { code: "UH", name: "Urban Health", phase: "CM" },
+                        { code: "RH", name: "Rural Health", phase: "CM" }
+                    ];
+                    
+                    // Define students and their schedules based on the provided data
+                    const scheduleData = `
+A1RMRADEYOFPLMFM
+A2RMRADEFPLMFMYO
+A3RMRADELMFMYOFP
+A4RADERMFMYOFPLM
+A5DERMRA
+B1RMRADEYOFPLMFM
+B2RMRADEFPLMFMYO
+B3RMRADELMFMYOFP
+B4RADERMFMYOFPLM
+B5DERMRA
+C1RMRADEYOFPLMFM
+C2RMRADEFPLMFMYO
+C3RMRADELMFMYOFP
+C4RADERMFMYOFPLM
+C5DERMRA
+D1YOFPLMFMRMRADE
+D2FPLMFMYORMRADE
+D3LMFMYOFPRMRADE
+D4FMYOFPLMRADERM
+D5DERMRA
+ENPYOROPAN
+PERHCHPHUHENPYCAOPAN
+ANOROPOBPE
+OROP
+GS
+PE
+OB
+UHRHCHPHCA
+PHUHRHCHPYCAEN
+GM
+AN
+CHPHUHRHGMPYCAENGS
+PYOROPAN
+RHCHPHUHENPYCAOPAN
+ANOROP
+PE
+OB
+PHUHRHCHPYCAEN
+GM
+ANOROP
+GS
+PE
+UHRHCHPHCAEN
+CA
+OBPECHPHUHRHGMPYCAENGS
+CHPYCAEN
+GMOROPAN
+PE
+UHRHCHPHCAENPY
+OPANRHCHPHUHENPY
+ANOROP
+GS
+PE
+OB
+PHUHRH
+PHUH
+GSANOROPOBPECHPHUHRHGMPYCAEN
+GS
+PE
+OB
+PHUHRHCH
+CAENPYOROPAN
+PE
+UHRH
+CH
+CHPH
+ENPYCAOPANRH
+GMPYCAENGSANOROPOBPECHPHUHRH
+PYCAEN
+GM
+ANOROP`;
+                    
+                    // Parse the schedule data
+                    const lines = scheduleData.trim().split('\n');
+                    
+                    // Create students and their schedules
+                    this.students = [];
+                    this.schedule = [];
+                    
+                    // Process each line as a student or additional schedule data
+                    let currentStudentIndex = 0;
+                    
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        
+                        // Check if this is a student line (starts with A, B, C, or D followed by a number)
+                        if (/^[A-D][1-5]/.test(line)) {
+                            const studentId = line.substring(0, 2);
+                            const batch = studentId.charAt(0);
+                            const scheduleData = line.substring(2);
+                            
+                            // Add student
+                            this.students.push({
+                                id: studentId,
+                                name: `Student ${studentId}`,
+                                batch: batch,
+                                regdNo: `REG${batch}${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`
+                            });
+                            
+                            // Add schedule entries for this student
+                            for (let week = 1; week <= scheduleData.length; week++) {
+                                if (week <= scheduleData.length) {
+                                    const rotationCode = scheduleData.charAt(week - 1);
+                                    if (rotationCode && rotationCode !== ' ') {
+                                        this.schedule.push({
+                                            studentId: studentId,
+                                            week: week,
+                                            rotation: rotationCode
+                                        });
+                                    }
+                                }
+                            }
+                            
+                            currentStudentIndex++;
+                        } else {
+                            // This is additional schedule data for existing students
+                            // We'll distribute it among the students we've already created
+                            if (this.students.length > 0) {
+                                const studentIndex = currentStudentIndex % this.students.length;
+                                const studentId = this.students[studentIndex].id;
+                                
+                                // Find the last week for this student
+                                let lastWeek = 0;
+                                this.schedule.forEach(entry => {
+                                    if (entry.studentId === studentId && entry.week > lastWeek) {
+                                        lastWeek = entry.week;
+                                    }
+                                });
+                                
+                                // Add new schedule entries
+                                for (let j = 0; j < line.length; j++) {
+                                    const rotationCode = line.charAt(j);
+                                    if (rotationCode && rotationCode !== ' ') {
+                                        this.schedule.push({
+                                            studentId: studentId,
+                                            week: lastWeek + j + 1,
+                                            rotation: rotationCode
+                                        });
+                                    }
+                                }
+                                
+                                currentStudentIndex++;
+                            }
+                        }
+                    }
+                },
+                
+                // Get filtered students based on current filters
+                get filteredStudents() {
+                    let filtered = [...this.students];
+                    
+                    if (this.filters.batch !== "all") {
+                        filtered = filtered.filter(student => student.batch === this.filters.batch);
+                    }
+                    
+                    if (this.searchQuery && this.searchQuery.length > 1) {
+                        const query = this.searchQuery.toLowerCase();
+                        filtered = filtered.filter(student => 
+                            student.name.toLowerCase().includes(query) || 
+                            student.id.toLowerCase().includes(query) ||
+                            student.regdNo.toLowerCase().includes(query)
+                        );
+                    }
+                    
+                    return filtered;
+                },
+                
+                // Get rotation for a specific student and week
+                getRotationForStudentWeek(studentId, week) {
+                    const entry = this.schedule.find(s => s.studentId === studentId && s.week === week);
+                    
+                    if (!entry) return "";
+                    
+                    const rotation = this.rotations.find(r => r.code === entry.rotation);
+                    if (!rotation) return entry.rotation;
+                    
+                    let bgColor = "bg-gray-100";
+                    let textColor = "text-gray-800";
+                    
+                    switch (rotation.phase) {
+                        case "M":
+                            bgColor = "bg-blue-100";
+                            textColor = "text-blue-800";
+                            break;
+                        case "S":
+                            bgColor = "bg-green-100";
+                            textColor = "text-green-800";
+                            break;
+                        case "O":
+                            bgColor = "bg-purple-100";
+                            textColor = "text-purple-800";
+                            break;
+                        case "Misc":
+                            bgColor = "bg-yellow-100";
+                            textColor = "text-yellow-800";
+                            break;
+                        case "CM":
+                            bgColor = "bg-red-100";
+                            textColor = "text-red-800";
+                            break;
+                    }
+                    
+                    return `<div class="w-full h-full ${bgColor} ${textColor} font-bold text-xs flex items-center justify-center">${entry.rotation}</div>`;
+                },
+                
+                // Get tooltip text for a rotation
+                getRotationTooltip(studentId, week) {
+                    const entry = this.schedule.find(s => s.studentId === studentId && s.week === week);
+                    if (!entry) return "No rotation scheduled";
+                    
+                    const rotation = this.rotations.find(r => r.code === entry.rotation);
+                    if (!rotation) return `Rotation: ${entry.rotation}`;
+                    
+                    return `${rotation.name} (${rotation.code}) - Week ${week}`;
+                },
+                
+                // Apply filters
+                applyFilters() {
+                    // This function is called when the Apply Filters button is clicked
+                    // The filteredStudents getter will automatically update based on the current filters
+                    
+                    // Show a notification
+                    this.showNotification("Filters Applied", "The schedule has been updated with your filter criteria");
+                },
+                
+                // Reset filters to default values
+                resetFilters() {
+                    this.filters = {
+                        batch: "all",
+                        phase: "all",
+                        rotation: "all",
+                        startWeek: "",
+                        endWeek: ""
+                    };
+                    this.searchQuery = "";
+                    
+                    // Show a notification
+                    this.showNotification("Filters Reset", "All filters have been cleared");
+                },
+                
+                // Set current week
+                setCurrentWeek() {
+                    if (this.currentWeek < 1) this.currentWeek = 1;
+                    if (this.currentWeek > 52) this.currentWeek = 52;
+                    
+                    // Show a notification
+                    this.showNotification("Current Week Updated", `Current week set to Week ${this.currentWeek}`);
+                },
+                
+                // Save current filter
+                saveCurrentFilter() {
+                    if (!this.saveFilterName.trim()) {
+                        this.showNotification("Filter Name Required", "Please enter a name for your filter", "error");
+                        return;
+                    }
+                    
+                    const newFilter = {
+                        id: Date.now().toString(),
+                        name: this.saveFilterName,
+                        ...this.filters
+                    };
+                    
+                    this.savedFilters.push(newFilter);
+                    this.saveFilterName = "";
+                    this.isSaveFilterOpen = false;
+                    
+                    // Save to localStorage
+                    localStorage.setItem("savedFilters", JSON.stringify(this.savedFilters));
+                    
+                    // Show a notification
+                    this.showNotification("Filter Saved", `Filter "${newFilter.name}" has been saved for quick access`);
+                },
+                
+                // Open save filter modal
+                openSaveFilterModal() {
+                    this.saveFilterName = "";
+                    this.isSaveFilterOpen = true;
+                    this.isSavedFiltersOpen = false;
+                },
+                
+                // Apply a saved filter
+                applySavedFilter(filter) {
+                    this.filters = {
+                        batch: filter.batch,
+                        phase: filter.phase,
+                        rotation: filter.rotation,
+                        startWeek: filter.startWeek,
+                        endWeek: filter.endWeek
+                    };
+                    
+                    this.isSavedFiltersOpen = false;
+                    
+                    // Show a notification
+                    this.showNotification("Filter Applied", `Filter "${filter.name}" has been applied`);
+                },
+                
+                // Delete a saved filter
+                deleteSavedFilter(id) {
+                    this.savedFilters = this.savedFilters.filter(filter => filter.id !== id);
+                    
+                    // Save to localStorage
+                    localStorage.setItem("savedFilters", JSON.stringify(this.savedFilters));
+                    
+                    // Show a notification
+                    this.showNotification("Filter Deleted", "The saved filter has been removed");
+                },
+                
+                // Get phase name from code
+                getPhaseName(phaseCode) {
+                    switch (phaseCode) {
+                        case "M": return "Medicine";
+                        case "S": return "Surgery";
+                        case "O": return "OBGY";
+                        case "Misc": return "Misc";
+                        case "CM": return "Community Medicine";
+                        default: return phaseCode;
+                    }
+                },
+                
+                // Export to CSV
+                exportToCSV() {
+                    // Create CSV content
+                    let csvContent = "Student ID,";
+                    
+                    // Add week headers
+                    for (let week = 1; week <= 52; week++) {
+                        csvContent += `Week ${week},`;
+                    }
+                    csvContent += "\n";
+                    
+                    // Add data for each student
+                    this.filteredStudents.forEach(student => {
+                        csvContent += `${student.id},`;
+                        
+                        for (let week = 1; week <= 52; week++) {
+                            const entry = this.schedule.find(s => s.studentId === student.id && s.week === week);
+                            csvContent += entry ? entry.rotation : "";
+                            csvContent += ",";
+                        }
+                        
+                        csvContent += "\n";
+                    });
+                    
+                    // Create a download link
+                    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", "medical_rotation_schedule.csv");
+                    link.style.visibility = "hidden";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Show a notification
+                    this.showNotification("Export Complete", "Your data has been exported to CSV");
+                },
+                
+                // Print schedule
+                printSchedule() {
+                    window.print();
+                },
+                
+                // Show notification (simple implementation - in a real app, you'd use a toast library)
+                showNotification(title, message, type = "success") {
+                    // Create notification element
+                    const notification = document.createElement("div");
+                    notification.className = `fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50 flex items-start max-w-sm transform transition-all duration-300 ease-in-out translate-y-20 opacity-0`;
+                    
+                    // Set background color based on type
+                    if (type === "success") {
+                        notification.classList.add("border-l-4", "border-teal-500");
+                    } else if (type === "error") {
+                        notification.classList.add("border-l-4", "border-red-500");
+                    }
+                    
+                    // Create content
+                    notification.innerHTML = `
+                        <div class="flex-shrink-0 mr-3">
+                            <i class="fas ${type === 'success' ? 'fa-check-circle text-teal-500' : 'fa-exclamation-circle text-red-500'} text-lg"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-semibold text-gray-900">${title}</h4>
+                            <p class="text-xs text-gray-600 mt-1">${message}</p>
+                        </div>
+                        <button class="ml-4 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    // Add to document
+                    document.body.appendChild(notification);
+                    
+                    // Animate in
+                    setTimeout(() => {
+                        notification.classList.remove("translate-y-20", "opacity-0");
+                    }, 10);
+                    
+                    // Add click handler to close button
+                    notification.querySelector("button").addEventListener("click", () => {
+                        notification.classList.add("translate-y-20", "opacity-0");
+                        setTimeout(() => {
+                            document.body.removeChild(notification);
+                        }, 300);
+                    });
+                    
+                    // Auto remove after 5 seconds
+                    setTimeout(() => {
+                        if (document.body.contains(notification)) {
+                            notification.classList.add("translate-y-20", "opacity-0");
+                            setTimeout(() => {
+                                if (document.body.contains(notification)) {
+                                    document.body.removeChild(notification);
+                                }
+                            }, 300);
+                        }
+                    }, 5000);
+                }
+            };
+        }
+    </script>
+</body>
+</html>
