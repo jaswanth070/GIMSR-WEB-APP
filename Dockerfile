@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -29,7 +29,6 @@ ENV NODE_ENV production
 # Create a non-root user and group
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
-
 
 # Copy necessary files
 COPY --from=builder /app/public ./public

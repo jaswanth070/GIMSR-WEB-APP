@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button"
 import { Eye } from "lucide-react"
 import { useSchedulerStore } from "@/lib/store"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart } from "lucide-react"
+import { BarChart, Search } from "lucide-react"
 import { LoadingSpinner } from "@/components/loading-spinner"
+import { Input } from "@/components/ui/input"
+import { useState } from "react"
 
 export function RotationView() {
   const {
@@ -16,13 +18,37 @@ export function RotationView() {
     viewStudentsInRotation,
   } = useSchedulerStore()
 
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const allRotations = getAllRotations()
+
+  const filteredRotations = allRotations.filter(
+    (rotation) =>
+      rotation.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rotation.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rotation.phase.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
+
   return (
     <Card className="mb-6 border border-gray-100">
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-semibold text-primary-700 flex items-center">
-          <BarChart className="h-6 w-6 mr-2" />
-          Schedule Visualization
-        </CardTitle>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <CardTitle className="text-xl font-semibold text-primary-700 flex items-center">
+            <BarChart className="h-6 w-6 mr-2" />
+            Rotations Overview
+          </CardTitle>
+
+          <div className="relative w-full md:w-64">
+            <Input
+              type="text"
+              placeholder="Search rotations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input pr-8"
+            />
+            <Search className="absolute right-3 top-2.5 h-4 w-4 text-gray-400" />
+          </div>
+        </div>
       </CardHeader>
 
       <CardContent>
@@ -46,7 +72,7 @@ export function RotationView() {
                     </tr>
                   </thead>
                   <tbody>
-                    {getAllRotations().map((rotation) => {
+                    {filteredRotations.map((rotation) => {
                       const students = getStudentsInRotation(rotation.code)
 
                       return (
@@ -87,7 +113,7 @@ export function RotationView() {
                             <Button
                               onClick={() => viewStudentsInRotation(rotation.code)}
                               size="sm"
-                              className="bg-primary-600 hover:bg-primary-700 flex items-center"
+                              className="bg-primary-600 hover:bg-primary-700 flex items-center flash-hover-effect"
                               disabled={rotation.studentCount === 0}
                             >
                               <Eye className="h-4 w-4 mr-1" />

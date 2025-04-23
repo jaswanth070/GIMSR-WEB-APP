@@ -15,7 +15,12 @@ export function DashboardView() {
     getActiveRotations,
     setViewType,
     viewStudentsInRotation,
+    getActualStudentCount,
   } = useSchedulerStore()
+
+  // Get the actual student count (non-placeholder students)
+  const actualStudentCount = getActualStudentCount()
+  const totalStudentCount = 136 // Total capacity (34 per batch)
 
   return (
     <div className="space-y-8 animate-in fade-in-50 duration-300">
@@ -29,7 +34,10 @@ export function DashboardView() {
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-primary-600">{students.length}</p>
+            <p className="text-3xl font-bold text-primary-600">
+              {actualStudentCount}
+              <span className="text-lg text-gray-500">/{totalStudentCount}</span>
+            </p>
             <div className="mt-2 text-sm text-gray-500 flex items-center">
               <span>Across all batches</span>
               <span className="ml-auto bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">Active</span>
@@ -82,6 +90,7 @@ export function DashboardView() {
         </Card>
       </div>
 
+      {/* Rest of the component remains unchanged */}
       {/* Batch Overview */}
       <Card className="border border-gray-100">
         <CardHeader className="pb-2">

@@ -28,7 +28,6 @@ export function Footer() {
                 Madiya Jaswanth
               </Link>
             </p>
-            <p className="text-xs text-primary-100 mt-1">Version 2.0</p>
           </div>
         </div>
       </div>

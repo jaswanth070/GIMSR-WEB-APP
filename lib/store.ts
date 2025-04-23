@@ -5,14 +5,13 @@ import isoWeek from "dayjs/plugin/isoWeek"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import type { Student, ScheduleItem, RotationDefinition, Rotation, Phase, Filters, WeekInfo } from "@/lib/types"
 import Papa from "papaparse"
-import { type DataSlice, createDataSlice } from "./store-part2"
 
 // Initialize dayjs plugins
 dayjs.extend(weekOfYear)
 dayjs.extend(isoWeek)
 dayjs.extend(customParseFormat)
 
-export type StoreState = {
+export interface StoreState {
   // Data
   students: Student[]
   schedule: ScheduleItem[]
@@ -25,7 +24,7 @@ export type StoreState = {
   filters: Filters
 
   // View settings
-  viewType: "dashboard" | "calendar" | "student" | "rotation" | "batch"
+  viewType: "dashboard" | "calendar" | "student" | "rotation" | "batch" | "timeline"
   currentViewStartDate: Dayjs
   currentViewEndDate: Dayjs
   jumpToDate: string
@@ -64,10 +63,11 @@ export type StoreState = {
 
   // Methods
   initialize: () => Promise<void>
-  setViewType: (viewType: "dashboard" | "calendar" | "student" | "rotation" | "batch") => void
+  setViewType: (viewType: "dashboard" | "calendar" | "student" | "rotation" | "batch" | "timeline") => void
   toggleFilters: () => void
   setStudentSearchQuery: (query: string) => void
   setStudentListSearch: (search: string) => void
+  setSubPhaseStudentSearch: (search: string) => void
   setJumpToDate: (date: string) => void
   selectStudent: (studentId: string) => void
   jumpToSelectedDate: () => void
@@ -95,6 +95,9 @@ export type StoreState = {
   getCurrentWeekDates: () => Dayjs[]
   getStudentsForDate: (date: Dayjs) => (Student & { rotation: string })[]
   getFilteredStudents: () => Student[]
+  getFilteredStudentsList: () => Student[]
+  getFilteredSchedule: () => ScheduleItem[]
+  getStudentRotationForDate: (studentId: string, date: Dayjs) => ScheduleItem | undefined
   getStudentRotationForWeek: (studentId: string, weekStartDate: Dayjs) => ScheduleItem | undefined
   getCurrentRotationForStudent: (studentId: string) => {
     rotation: string
@@ -102,6 +105,7 @@ export type StoreState = {
     endDate: Date | null
   }
   getNextRotationForStudent: (studentId: string) => ScheduleItem | null
+  getFullScheduleForStudent: (studentId: string | null) => WeekInfo[]
   getFullScheduleByPhase: (studentId: string | null) => Record<string, WeekInfo[]>
   getStudentsInRotation: (rotationCode: string) => Student[]
   getAllRotations: () => Rotation[]
@@ -113,7 +117,59 @@ export type StoreState = {
   getCurrentWeek: () => number
   getCompletionPercentage: () => number
   getFilteredSubPhaseStudents: () => (Student & { startDate: Date | null; endDate: Date | null })[]
-} & DataSlice
+  getCompletedRotationsForStudent: (studentId: string) => string[]
+  getActualStudentCount: () => number
+
+  // Data loading functions
+  loadStudentsFromCSV: () => Promise<void>
+  generateStudents: () => void
+  defineRotations: () => void
+  definePhases: () => void
+  defineBatchPhases: () => void
+  generateSchedule: () => void
+  generateMedicinePhase: (
+    batch: string,
+    students: Student[],
+    startDate: Dayjs,
+    endDate: Dayjs,
+    schedule: ScheduleItem[],
+  ) => void
+  generateSurgeryPhase: (
+    batch: string,
+    students: Student[],
+    startDate: Dayjs,
+    endDate: Dayjs,
+    schedule: ScheduleItem[],
+  ) => void
+  generateOBGYPhase: (
+    batch: string,
+    students: Student[],
+    startDate: Dayjs,
+    endDate: Dayjs,
+    schedule: ScheduleItem[],
+  ) => void
+  generateMiscPhase: (
+    batch: string,
+    students: Student[],
+    startDate: Dayjs,
+    endDate: Dayjs,
+    schedule: ScheduleItem[],
+  ) => void
+  generateCommunityMedicinePhase: (
+    batch: string,
+    students: Student[],
+    startDate: Dayjs,
+    endDate: Dayjs,
+    schedule: ScheduleItem[],
+  ) => void
+  assignStudentsToRotation: (
+    students: Student[],
+    rotation: string,
+    startDate: Dayjs,
+    endDate: Dayjs,
+    schedule: ScheduleItem[],
+  ) => void
+}
 
 export const useSchedulerStore = create<StoreState>((set, get) => ({
   // Initial state
@@ -169,6 +225,8 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
   initialize: async () => {
     // Set initial date range
     const startDate = dayjs("2025-04-01")
+    const today = dayjs("2025-04-15") // Set a fixed date to ensure all phases are visible
+
     set({
       currentViewStartDate: startDate,
       currentViewEndDate: startDate.add(6, "day"),
@@ -177,9 +235,9 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
         startDate: startDate.format("YYYY-MM-DD"),
         endDate: startDate.add(52, "week").format("YYYY-MM-DD"),
       },
-      jumpToDate: dayjs().format("YYYY-MM-DD"),
+      jumpToDate: today.format("YYYY-MM-DD"),
       originalToday: dayjs,
-      customToday: null,
+      customToday: today,
     })
 
     // Load student data
@@ -706,128 +764,206 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
     endDate: Dayjs,
     schedule: ScheduleItem[],
   ) => {
+    // Split the 12-week period into two 6-week periods
     const midpointDate = startDate.add(6, "week").subtract(1, "day")
     const secondHalfStartDate = midpointDate.add(1, "day")
 
-    // Split students into two groups
-    const group1 = students.slice(0, 17)
-    const group2 = students.slice(17)
+    // Split students into two main groups (G1 and G2)
+    const group1 = students.slice(0, 17) // First 17 students
+    const group2 = students.slice(17) // Remaining 17 students
 
-    // Group 1 in OB for the first half
+    // FIRST 6 WEEKS
+    // G1 does OB for 6 weeks
     get().assignStudentsToRotation(group1, "OB", startDate, midpointDate, schedule)
 
-    // Split Group 2 into PE and rotation subgroups
-    const peGroup = group2.slice(0, 8)
-    const rotationGroup = group2.slice(8)
+    // G2 is further divided:
+    // SG1 (8 students) does PE for first 3 weeks
+    const sg1FirstHalf = group2.slice(0, 8)
+    get().assignStudentsToRotation(sg1FirstHalf, "PE", startDate, startDate.add(2, "week").add(6, "day"), schedule)
 
-    // First half: PE group in PE, rotation group in RM/RA/DE
-    get().assignStudentsToRotation(peGroup, "PE", startDate, midpointDate, schedule)
+    // Remaining students (SG2, SG3, SG4) rotate through RM, RA, DE
+    const rotationGroup1 = group2.slice(8)
 
-    // Split rotation group into 3 subgroups
-    const rmGroup = rotationGroup.slice(0, 3)
-    const raGroup = rotationGroup.slice(3, 6)
-    const deGroup = rotationGroup.slice(6)
-
-    // Assign 2-week rotations for first half
-    // First 2 weeks
-    get().assignStudentsToRotation(rmGroup, "RM", startDate, startDate.add(1, "week").add(6, "day"), schedule)
-    get().assignStudentsToRotation(raGroup, "RA", startDate, startDate.add(1, "week").add(6, "day"), schedule)
-    get().assignStudentsToRotation(deGroup, "DE", startDate, startDate.add(1, "week").add(6, "day"), schedule)
-
-    // Second 2 weeks
+    // SG2 (3 students): RM -> RA -> DE
+    const sg2 = rotationGroup1.slice(0, 3)
+    get().assignStudentsToRotation(sg2, "RM", startDate, startDate.add(0, "week").add(6, "day"), schedule)
     get().assignStudentsToRotation(
-      rmGroup,
+      sg2,
+      "RA",
+      startDate.add(1, "week"),
+      startDate.add(1, "week").add(6, "day"),
+      schedule,
+    )
+    get().assignStudentsToRotation(
+      sg2,
       "DE",
       startDate.add(2, "week"),
-      startDate.add(3, "week").add(6, "day"),
+      startDate.add(2, "week").add(6, "day"),
+      schedule,
+    )
+
+    // SG3 (3 students): RA -> DE -> RM
+    const sg3 = rotationGroup1.slice(3, 6)
+    get().assignStudentsToRotation(sg3, "RA", startDate, startDate.add(0, "week").add(6, "day"), schedule)
+    get().assignStudentsToRotation(
+      sg3,
+      "DE",
+      startDate.add(1, "week"),
+      startDate.add(1, "week").add(6, "day"),
       schedule,
     )
     get().assignStudentsToRotation(
-      raGroup,
+      sg3,
       "RM",
       startDate.add(2, "week"),
-      startDate.add(3, "week").add(6, "day"),
+      startDate.add(2, "week").add(6, "day"),
+      schedule,
+    )
+
+    // SG4 (3 students): DE -> RM -> RA
+    const sg4 = rotationGroup1.slice(6)
+    get().assignStudentsToRotation(sg4, "DE", startDate, startDate.add(0, "week").add(6, "day"), schedule)
+    get().assignStudentsToRotation(
+      sg4,
+      "RM",
+      startDate.add(1, "week"),
+      startDate.add(1, "week").add(6, "day"),
       schedule,
     )
     get().assignStudentsToRotation(
-      deGroup,
+      sg4,
       "RA",
       startDate.add(2, "week"),
-      startDate.add(3, "week").add(6, "day"),
+      startDate.add(2, "week").add(6, "day"),
       schedule,
     )
 
-    // Third 2 weeks
-    get().assignStudentsToRotation(rmGroup, "RA", startDate.add(4, "week"), midpointDate, schedule)
-    get().assignStudentsToRotation(raGroup, "DE", startDate.add(4, "week"), midpointDate, schedule)
-    get().assignStudentsToRotation(deGroup, "RM", startDate.add(4, "week"), midpointDate, schedule)
+    // For second 3 weeks of first half, swap SG1 with merged SG2+SG3+SG4
+    // SG1 now rotates through specialties for second 3 weeks
+    const secondThreeWeeksStart = startDate.add(3, "week")
+    const secondThreeWeeksEnd = midpointDate
 
-    // Second half: Group 2 in OB, Group 1 split between PE and rotations
+    // Divide SG1 into 3 roughly equal subgroups
+    const sg1a = sg1FirstHalf.slice(0, 3)
+    const sg1b = sg1FirstHalf.slice(3, 6)
+    const sg1c = sg1FirstHalf.slice(6)
+
+    // SG1a: RM
+    get().assignStudentsToRotation(sg1a, "RM", secondThreeWeeksStart, secondThreeWeeksEnd, schedule)
+    // SG1b: RA
+    get().assignStudentsToRotation(sg1b, "RA", secondThreeWeeksStart, secondThreeWeeksEnd, schedule)
+    // SG1c: DE
+    get().assignStudentsToRotation(sg1c, "DE", secondThreeWeeksStart, secondThreeWeeksEnd, schedule)
+
+    // Merged SG2+SG3+SG4 does PE for second 3 weeks
+    get().assignStudentsToRotation(rotationGroup1, "PE", secondThreeWeeksStart, secondThreeWeeksEnd, schedule)
+
+    // SECOND 6 WEEKS - Swap G1 and G2
+    // G2 does OB for 6 weeks
     get().assignStudentsToRotation(group2, "OB", secondHalfStartDate, endDate, schedule)
 
-    // Split Group 1 into PE and rotations subgroups
-    const peGroup2 = group1.slice(0, 8)
+    // G1 is further divided:
+    // First 8 students do PE for first 3 weeks
+    const sg1SecondHalf = group1.slice(0, 8)
+    get().assignStudentsToRotation(
+      sg1SecondHalf,
+      "PE",
+      secondHalfStartDate,
+      secondHalfStartDate.add(2, "week").add(6, "day"),
+      schedule,
+    )
+
+    // Remaining students rotate through RM, RA, DE
     const rotationGroup2 = group1.slice(8)
 
-    // Second half: PE group in PE, rotation group in RM/RA/DE
-    get().assignStudentsToRotation(peGroup2, "PE", secondHalfStartDate, endDate, schedule)
-
-    // Split rotation group into 3 subgroups
-    const rmGroup2 = rotationGroup2.slice(0, 3)
-    const raGroup2 = rotationGroup2.slice(3, 6)
-    const deGroup2 = rotationGroup2.slice(6)
-
-    // Assign 2-week rotations for second half
-    // First 2 weeks
+    // First 3 students: RM -> RA -> DE
+    const sg2SecondHalf = rotationGroup2.slice(0, 3)
     get().assignStudentsToRotation(
-      rmGroup2,
+      sg2SecondHalf,
       "RM",
       secondHalfStartDate,
-      secondHalfStartDate.add(1, "week").add(6, "day"),
+      secondHalfStartDate.add(0, "week").add(6, "day"),
       schedule,
     )
     get().assignStudentsToRotation(
-      raGroup2,
+      sg2SecondHalf,
       "RA",
-      secondHalfStartDate,
+      secondHalfStartDate.add(1, "week"),
       secondHalfStartDate.add(1, "week").add(6, "day"),
       schedule,
     )
     get().assignStudentsToRotation(
-      deGroup2,
+      sg2SecondHalf,
       "DE",
-      secondHalfStartDate,
-      secondHalfStartDate.add(1, "week").add(6, "day"),
+      secondHalfStartDate.add(2, "week"),
+      secondHalfStartDate.add(2, "week").add(6, "day"),
       schedule,
     )
 
-    // Second 2 weeks
+    // Next 3 students: RA -> DE -> RM
+    const sg3SecondHalf = rotationGroup2.slice(3, 6)
     get().assignStudentsToRotation(
-      rmGroup2,
-      "DE",
-      secondHalfStartDate.add(2, "week"),
-      secondHalfStartDate.add(3, "week").add(6, "day"),
+      sg3SecondHalf,
+      "RA",
+      secondHalfStartDate,
+      secondHalfStartDate.add(0, "week").add(6, "day"),
       schedule,
     )
     get().assignStudentsToRotation(
-      raGroup2,
+      sg3SecondHalf,
+      "DE",
+      secondHalfStartDate.add(1, "week"),
+      secondHalfStartDate.add(1, "week").add(6, "day"),
+      schedule,
+    )
+    get().assignStudentsToRotation(
+      sg3SecondHalf,
       "RM",
       secondHalfStartDate.add(2, "week"),
-      secondHalfStartDate.add(3, "week").add(6, "day"),
-      schedule,
-    )
-    get().assignStudentsToRotation(
-      deGroup2,
-      "RA",
-      secondHalfStartDate.add(2, "week"),
-      secondHalfStartDate.add(3, "week").add(6, "day"),
+      secondHalfStartDate.add(2, "week").add(6, "day"),
       schedule,
     )
 
-    // Third 2 weeks
-    get().assignStudentsToRotation(rmGroup2, "RA", secondHalfStartDate.add(4, "week"), endDate, schedule)
-    get().assignStudentsToRotation(raGroup2, "DE", secondHalfStartDate.add(4, "week"), endDate, schedule)
-    get().assignStudentsToRotation(deGroup2, "RM", secondHalfStartDate.add(4, "week"), endDate, schedule)
+    // Last 3 students: DE -> RM -> RA
+    const sg4SecondHalf = rotationGroup2.slice(6)
+    get().assignStudentsToRotation(
+      sg4SecondHalf,
+      "DE",
+      secondHalfStartDate,
+      secondHalfStartDate.add(0, "week").add(6, "day"),
+      schedule,
+    )
+    get().assignStudentsToRotation(
+      sg4SecondHalf,
+      "RM",
+      secondHalfStartDate.add(1, "week"),
+      secondHalfStartDate.add(1, "week").add(6, "day"),
+      schedule,
+    )
+    get().assignStudentsToRotation(
+      sg4SecondHalf,
+      "RA",
+      secondHalfStartDate.add(2, "week"),
+      secondHalfStartDate.add(2, "week").add(6, "day"),
+      schedule,
+    )
+
+    // For second 3 weeks of second half, swap PE group with rotation group
+    const secondHalfThreeWeeksStart = secondHalfStartDate.add(3, "week")
+    const secondHalfThreeWeeksEnd = endDate
+
+    // Divide PE group into 3 roughly equal subgroups
+    const sg1aSecondHalf = sg1SecondHalf.slice(0, 3)
+    const sg1bSecondHalf = sg1SecondHalf.slice(3, 6)
+    const sg1cSecondHalf = sg1SecondHalf.slice(6)
+
+    // Assign rotations for second 3 weeks
+    get().assignStudentsToRotation(sg1aSecondHalf, "RM", secondHalfThreeWeeksStart, secondHalfThreeWeeksEnd, schedule)
+    get().assignStudentsToRotation(sg1bSecondHalf, "RA", secondHalfThreeWeeksStart, secondHalfThreeWeeksEnd, schedule)
+    get().assignStudentsToRotation(sg1cSecondHalf, "DE", secondHalfThreeWeeksStart, secondHalfThreeWeeksEnd, schedule)
+
+    // Merged rotation group does PE for second 3 weeks
+    get().assignStudentsToRotation(rotationGroup2, "PE", secondHalfThreeWeeksStart, secondHalfThreeWeeksEnd, schedule)
   },
 
   // Generate Misc phase schedule
@@ -943,7 +1079,8 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
   },
 
   // UI state management
-  setViewType: (viewType) => set({ viewType }),
+  setViewType: (viewType: "dashboard" | "calendar" | "student" | "rotation" | "batch" | "timeline") =>
+    set({ viewType }),
 
   toggleFilters: () => set((state) => ({ showFilters: !state.showFilters })),
 
@@ -969,12 +1106,10 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
   },
 
   setStudentListSearch: (search) => {
-    set({ studentListSearch: search, studentViewLoading: true })
+    set({ studentListSearch: search })
 
-    setTimeout(() => {
-      const filteredStudents = get().getFilteredStudentsList()
-      set({ filteredStudents, studentViewLoading: false })
-    }, 300)
+    const filteredStudents = get().getFilteredStudentsList()
+    set({ filteredStudents, studentViewLoading: false })
   },
 
   setSubPhaseStudentSearch: (search) => set({ subPhaseStudentSearch: search }),
@@ -1609,7 +1744,7 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
   },
 
   getFilteredSubPhaseStudents: () => {
-    const { selectedRotation, subPhaseStudentSearch, students, schedule } = get()
+    const { selectedRotation, subPhaseStudentSearch, students } = get()
     if (!selectedRotation) return []
 
     const today = get().getCurrentDate()
@@ -1621,6 +1756,8 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
         (s) => s.name.toLowerCase().includes(search) || s.regdNo.toLowerCase().includes(search),
       )
     }
+
+    const { schedule } = get()
 
     return filteredStudents.map((student) => {
       const scheduleItem = schedule.find(
@@ -1637,6 +1774,20 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
         endDate: scheduleItem ? scheduleItem.endDate : null,
       }
     })
+  },
+
+  getCompletedRotationsForStudent: (studentId) => {
+    const { schedule } = get()
+    const today = get().getCurrentDate()
+
+    // Find all rotations that have ended before today
+    return schedule.filter((s) => s.studentId === studentId && dayjs(s.endDate).isBefore(today)).map((s) => s.rotation)
+  },
+
+  getActualStudentCount: () => {
+    const { students } = get()
+    // Count students that don't have "PLACEHOLDER" in their regdNo
+    return students.filter((s) => !s.regdNo.includes("PLACEHOLDER")).length
   },
 
   // Export functions
@@ -1728,5 +1879,4 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
     link.click()
     document.body.removeChild(link)
   },
-  ...createDataSlice(set, get),
 }))

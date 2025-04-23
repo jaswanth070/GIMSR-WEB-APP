@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { LayoutGrid, Calendar, Users, LayoutList, Layers } from "lucide-react"
+import { LayoutGrid, Calendar, Users, LayoutList, Layers, TimerIcon as Timeline } from "lucide-react"
 import { useSchedulerStore } from "@/lib/store"
 import { cn } from "@/lib/utils"
 
@@ -14,6 +14,7 @@ export function ViewSelector() {
     { id: "student", label: "Students", icon: Users },
     { id: "rotation", label: "Rotations", icon: LayoutList },
     { id: "batch", label: "Batches", icon: Layers },
+    { id: "timeline", label: "Timeline", icon: Timeline },
   ]
 
   return (
