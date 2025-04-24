@@ -8,9 +8,9 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Medical Rotation Scheduler",
-  description: "Streamline your medical rotation management",
-    generator: 'v0.dev'
+  title: "CRMI - GIMSR",
+  description: "COMPULSORY ROTATORY MEDICAL INTERNSHIP",
+    // generator: 'v0.dev'
 }
 
 export default function RootLayout({
