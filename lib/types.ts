@@ -50,3 +50,5 @@ export interface WeekInfo {
   phase: string
   isCurrentWeek: boolean
 }
+
+export type ViewType = "dashboard" | "calendar" | "student" | "rotation" | "batch"

@@ -1,6 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { Eye } from "lucide-react"
+import { Eye, Download } from "lucide-react"
 import { useSchedulerStore } from "@/lib/store"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, Search } from "lucide-react"
@@ -16,6 +16,7 @@ export function RotationView() {
     getStudentsInRotation,
     formatDate,
     viewStudentsInRotation,
+    exportRotationDataToCSV,
   } = useSchedulerStore()
 
   const [searchQuery, setSearchQuery] = useState("")
@@ -110,15 +111,28 @@ export function RotationView() {
                           <td className="px-4 py-3 border-b border-gray-100">{formatDate(rotation.startDate)}</td>
                           <td className="px-4 py-3 border-b border-gray-100">{formatDate(rotation.endDate)}</td>
                           <td className="px-4 py-3 border-b border-gray-100">
-                            <Button
-                              onClick={() => viewStudentsInRotation(rotation.code)}
-                              size="sm"
-                              className="bg-primary-600 hover:bg-primary-700 flex items-center flash-hover-effect"
-                              disabled={rotation.studentCount === 0}
-                            >
-                              <Eye className="h-4 w-4 mr-1" />
-                              View Students
-                            </Button>
+                            <div className="flex space-x-2">
+                              <Button
+                                onClick={() => viewStudentsInRotation(rotation.code)}
+                                size="sm"
+                                className="bg-primary-600 hover:bg-primary-700 flex items-center flash-hover-effect"
+                                disabled={rotation.studentCount === 0}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                View
+                              </Button>
+
+                              <Button
+                                onClick={() => exportRotationDataToCSV(rotation.code)}
+                                size="sm"
+                                variant="outline"
+                                className="border-primary-600 text-primary-600 hover:bg-primary-50 flex items-center flash-hover-effect"
+                                disabled={rotation.studentCount === 0}
+                                title={`Export ${rotation.name} data`}
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       )

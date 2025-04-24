@@ -17,12 +17,11 @@ export function Header({ onShowDocumentation }: HeaderProps) {
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center mb-3 md:mb-0">
-            <div className="bg-white p-1.5 mr-3 w-12 h-12 flex items-center justify-center shadow-md">
-              <Image src="https://gimsr.gitam.edu/Images/gimsr-image-ivory.svg" alt="Logo" width={48} height={48} />
+            <div className="mr-3 w-18 h-18 flex items-center justify-center">
+              <Image src="https://gimsr.gitam.edu/Images/gimsr-image-ivory.svg" alt="Logo" width={128} height={128} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Medical Rotation Scheduler</h1>
-              <p className="text-xs text-primary-100">Streamline your medical rotation management</p>
+              <h1 className="text-2xl font-bold">COMPULSORY ROTATORY MEDICAL INTERNSHIP</h1>
             </div>
           </div>
           <div className="flex space-x-2">

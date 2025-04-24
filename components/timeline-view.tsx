@@ -1,17 +1,36 @@
 "use client"
+
 import { useEffect, useRef, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { AlertCircle, Calendar, ZoomIn, ZoomOut, RefreshCw } from "lucide-react"
+import { Calendar, ZoomIn, ZoomOut, RefreshCw } from "lucide-react"
 import { useSchedulerStore } from "@/lib/store"
 import { LoadingSpinner } from "@/components/loading-spinner"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import dayjs from "dayjs"
 import { TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
+import dayjs from "dayjs"
+
+// Define interfaces for timeline data
+interface CollisionItem {
+  studentId: string
+  studentName: string
+  regdNo: string
+  batch: string
+  rotationA: string
+  rotationB: string
+  startDate: string
+  endDate: string
+  daysOverlap: number
+}
+
+interface PhaseBlock {
+  phase: string
+  startDate: Date
+  endDate: Date
+}
 
 export function TimelineView() {
+  // Get store data and functions
   const {
     students,
     schedule,
@@ -23,12 +42,13 @@ export function TimelineView() {
     getCurrentDate,
   } = useSchedulerStore()
 
+  // Component state
   const [loading, setLoading] = useState(true)
   const [zoomLevel, setZoomLevel] = useState(1)
-  const [viewMode, setViewMode] = useState("batch")
+  const [viewMode, setViewMode] = useState<"batch" | "student" | "rotation">("batch")
   const [selectedBatch, setSelectedBatch] = useState("all")
   const [selectedPhase, setSelectedPhase] = useState("all")
-  const [collisions, setCollisions] = useState<any[]>([])
+  const [collisions, setCollisions] = useState<CollisionItem[]>([])
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const timelineRef = useRef<HTMLDivElement>(null)
   const today = getCurrentDate()
@@ -38,28 +58,39 @@ export function TimelineView() {
   const endDate = startDate.add(52, "week")
   const totalDays = endDate.diff(startDate, "day")
 
+  // Initialize and detect collisions when filters change
   useEffect(() => {
-    // Simulate loading
     setLoading(true)
-    setTimeout(() => {
+
+    // Use setTimeout to prevent UI freezing
+    const timer = setTimeout(() => {
       detectCollisions()
       setLoading(false)
-    }, 800)
+    }, 500)
+
+    return () => clearTimeout(timer)
   }, [selectedBatch, selectedPhase, viewMode])
 
-  // Scroll to current date when component mounts
+  // Scroll to current date when component mounts or zoom changes
   useEffect(() => {
     if (timelineRef.current && !loading) {
-      const currentDayPosition = (today.diff(startDate, "day") / totalDays) * 100 * zoomLevel
-      const scrollPosition =
-        (timelineRef.current.scrollWidth * currentDayPosition) / 100 - timelineRef.current.clientWidth / 2
-      timelineRef.current.scrollLeft = Math.max(0, scrollPosition)
+      scrollToCurrentDate()
     }
   }, [loading, zoomLevel])
 
+  // Function to scroll to current date
+  const scrollToCurrentDate = () => {
+    if (!timelineRef.current) return
+
+    const currentDayPosition = (today.diff(startDate, "day") / totalDays) * 100 * zoomLevel
+    const scrollPosition =
+      (timelineRef.current.scrollWidth * currentDayPosition) / 100 - timelineRef.current.clientWidth / 2
+    timelineRef.current.scrollLeft = Math.max(0, scrollPosition)
+  }
+
   // Detect schedule collisions
   const detectCollisions = () => {
-    const detected: any[] = []
+    const detected: CollisionItem[] = []
 
     // Filter students by batch if needed
     const relevantStudents = selectedBatch !== "all" ? students.filter((s) => s.batch === selectedBatch) : students
@@ -89,7 +120,7 @@ export function TimelineView() {
           const bEnd = dayjs(b.endDate)
 
           // Check for overlap
-          if (aStart <= bEnd && aEnd >= bStart) {
+          if (aStart.isBefore(bEnd) && aEnd.isAfter(bStart)) {
             detected.push({
               studentId: student.id,
               studentName: student.name,
@@ -97,9 +128,10 @@ export function TimelineView() {
               batch: student.batch,
               rotationA: a.rotation,
               rotationB: b.rotation,
-              startDate: bStart > aStart ? bStart.format("YYYY-MM-DD") : aStart.format("YYYY-MM-DD"),
-              endDate: bEnd < aEnd ? bEnd.format("YYYY-MM-DD") : aEnd.format("YYYY-MM-DD"),
-              daysOverlap: dayjs(bEnd < aEnd ? bEnd : aEnd).diff(bStart > aStart ? bStart : aStart, "day") + 1,
+              startDate: (bStart.isAfter(aStart) ? bStart : aStart).format("YYYY-MM-DD"),
+              endDate: (bEnd.isBefore(aEnd) ? bEnd : aEnd).format("YYYY-MM-DD"),
+              daysOverlap:
+                dayjs(bEnd.isBefore(aEnd) ? bEnd : aEnd).diff(bStart.isAfter(aStart) ? bStart : aStart, "day") + 1,
             })
           }
         }
@@ -109,14 +141,55 @@ export function TimelineView() {
     setCollisions(detected)
   }
 
-  // Generate timeline items based on view mode
-  const generateTimelineItems = () => {
-    if (viewMode === "batch") {
-      return generateBatchTimeline()
-    } else if (viewMode === "student") {
-      return generateStudentTimeline()
-    } else {
-      return generateRotationTimeline()
+  // Helper function to get phase name
+  const getPhaseName = (phase: string): string => {
+    switch (phase) {
+      case "MED":
+        return "Medicine"
+      case "SUR":
+        return "Surgery"
+      case "OBG":
+        return "OBGY"
+      case "OTH":
+        return "Others"
+      case "COM":
+        return "Community Medicine"
+      default:
+        return phase
+    }
+  }
+
+  // Helper function to get phase color
+  const getPhaseColor = (phase: string): string => {
+    switch (phase) {
+      case "MED":
+        return "bg-blue-200 border-blue-400 text-blue-800"
+      case "SUR":
+        return "bg-green-200 border-green-400 text-green-800"
+      case "OBG":
+        return "bg-purple-200 border-purple-400 text-purple-800"
+      case "OTH":
+        return "bg-yellow-200 border-yellow-400 text-yellow-800"
+      case "COM":
+        return "bg-red-200 border-red-400 text-red-800"
+      default:
+        return "bg-gray-200 border-gray-400 text-gray-800"
+    }
+  }
+
+  // Helper function to get batch color
+  const getBatchColor = (batch: string): string => {
+    switch (batch) {
+      case "A":
+        return "bg-blue-200 border-blue-400"
+      case "B":
+        return "bg-green-200 border-green-400"
+      case "C":
+        return "bg-purple-200 border-purple-400"
+      case "D":
+        return "bg-yellow-200 border-yellow-400"
+      default:
+        return "bg-gray-200 border-gray-400"
     }
   }
 
@@ -127,126 +200,102 @@ export function TimelineView() {
 
     return (
       <div className="space-y-6">
-        {filteredBatches.map((batch) => (
-          <div key={batch} className="relative">
-            <div className="flex items-center mb-2">
-              <div
-                className={`w-4 h-4 rounded-full mr-2 ${
-                  batch === "A"
-                    ? "bg-blue-500"
-                    : batch === "B"
-                      ? "bg-green-500"
-                      : batch === "C"
-                        ? "bg-purple-500"
-                        : "bg-yellow-500"
-                }`}
-              ></div>
-              <h3 className="text-lg font-semibold">Batch {batch}</h3>
-            </div>
+        {filteredBatches.map((batch) => {
+          // Get all schedule items for this batch
+          const batchScheduleItems = schedule.filter(
+            (s) => students.find((st) => st.id === s.studentId)?.batch === batch,
+          )
 
-            <div className="relative h-24 bg-gray-100 rounded-lg overflow-hidden">
-              {/* Timeline ruler */}
-              <div className="absolute top-0 left-0 w-full h-6 bg-gray-200 flex">
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="flex-1 border-r border-gray-300 text-xs text-gray-500 flex items-center justify-center"
-                  >
-                    {startDate.add(i * 4, "week").format("MMM")}
-                  </div>
-                ))}
+          // Group by phase
+          const phaseBlocks: PhaseBlock[] = batchScheduleItems.reduce((phases: PhaseBlock[], item) => {
+            const rotation = rotations.find((r) => r.code === item.rotation)
+            if (!rotation) return phases
+
+            // Filter by phase if selected
+            if (selectedPhase !== "all" && rotation.phase !== selectedPhase) return phases
+
+            const phase = rotation.phase
+            const existingPhase = phases.find((p) => p.phase === phase)
+
+            if (existingPhase) {
+              const itemStart = dayjs(item.startDate)
+              const itemEnd = dayjs(item.endDate)
+              const existingStart = dayjs(existingPhase.startDate)
+              const existingEnd = dayjs(existingPhase.endDate)
+
+              if (itemStart.isBefore(existingStart)) {
+                existingPhase.startDate = item.startDate
+              }
+
+              if (itemEnd.isAfter(existingEnd)) {
+                existingPhase.endDate = item.endDate
+              }
+
+              return phases
+            } else {
+              return [
+                ...phases,
+                {
+                  phase,
+                  startDate: item.startDate,
+                  endDate: item.endDate,
+                },
+              ]
+            }
+          }, [])
+
+          // Sort phases by start date
+          phaseBlocks.sort((a, b) => dayjs(a.startDate).diff(dayjs(b.startDate)))
+
+          return (
+            <div key={batch} className="relative">
+              <div className="flex items-center mb-2">
+                <div
+                  className={`w-4 h-4 rounded-full mr-2 ${
+                    batch === "A"
+                      ? "bg-blue-500"
+                      : batch === "B"
+                        ? "bg-green-500"
+                        : batch === "C"
+                          ? "bg-purple-500"
+                          : "bg-yellow-500"
+                  }`}
+                ></div>
+                <h3 className="text-lg font-semibold">Batch {batch}</h3>
               </div>
 
-              {/* Current date indicator */}
-              <div
-                className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20"
-                style={{
-                  left: `${(today.diff(startDate, "day") / totalDays) * 100 * zoomLevel}%`,
-                  height: "100%",
-                }}
-              >
-                <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
-              </div>
+              <div className="relative h-24 bg-gray-100 rounded-lg overflow-hidden">
+                {/* Timeline ruler */}
+                <div className="absolute top-0 left-0 w-full h-6 bg-gray-200 flex">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex-1 border-r border-gray-300 text-xs text-gray-500 flex items-center justify-center"
+                    >
+                      {startDate.add(i * 4, "week").format("MMM")}
+                    </div>
+                  ))}
+                </div>
 
-              {/* Phase blocks */}
-              <div className="absolute top-6 left-0 right-0 bottom-0 flex flex-col">
-                <div className="flex-1 relative">
-                  {schedule
-                    .filter((s) => students.find((st) => st.id === s.studentId)?.batch === batch)
-                    .reduce((phases: any[], item) => {
-                      const rotation = rotations.find((r) => r.code === item.rotation)
-                      if (!rotation) return phases
+                {/* Current date indicator */}
+                <div
+                  className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20"
+                  style={{
+                    left: `${(today.diff(startDate, "day") / totalDays) * 100 * zoomLevel}%`,
+                    height: "100%",
+                  }}
+                >
+                  <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
+                </div>
 
-                      // Filter by phase if selected
-                      if (selectedPhase !== "all" && rotation.phase !== selectedPhase) return phases
-
-                      const phase = rotation.phase
-                      const existingPhase = phases.find((p) => p.phase === phase)
-
-                      if (existingPhase) {
-                        const startDate = dayjs(item.startDate)
-                        const endDate = dayjs(item.endDate)
-
-                        if (startDate.isBefore(dayjs(existingPhase.startDate))) {
-                          existingPhase.startDate = item.startDate
-                        }
-
-                        if (endDate.isAfter(dayjs(existingPhase.endDate))) {
-                          existingPhase.endDate = item.endDate
-                        }
-
-                        return phases
-                      } else {
-                        return [
-                          ...phases,
-                          {
-                            phase,
-                            startDate: item.startDate,
-                            endDate: item.endDate,
-                          },
-                        ]
-                      }
-                    }, [])
-                    .sort((a, b) => dayjs(a.startDate).diff(dayjs(b.startDate)))
-                    .map((phaseBlock, idx) => {
+                {/* Phase blocks */}
+                <div className="absolute top-6 left-0 right-0 bottom-0 flex flex-col">
+                  <div className="flex-1 relative">
+                    {phaseBlocks.map((phaseBlock, idx) => {
                       const start = dayjs(phaseBlock.startDate)
                       const end = dayjs(phaseBlock.endDate)
                       const left = (start.diff(startDate, "day") / totalDays) * 100
                       const width = (end.diff(start, "day") / totalDays) * 100
-
-                      const getPhaseColor = (phase: string) => {
-                        switch (phase) {
-                          case "M":
-                            return "bg-blue-200 border-blue-400 text-blue-800"
-                          case "S":
-                            return "bg-green-200 border-green-400 text-green-800"
-                          case "O":
-                            return "bg-purple-200 border-purple-400 text-purple-800"
-                          case "Misc":
-                            return "bg-yellow-200 border-yellow-400 text-yellow-800"
-                          case "CM":
-                            return "bg-red-200 border-red-400 text-red-800"
-                          default:
-                            return "bg-gray-200 border-gray-400 text-gray-800"
-                        }
-                      }
-
-                      const getPhaseName = (phase: string) => {
-                        switch (phase) {
-                          case "M":
-                            return "Medicine"
-                          case "S":
-                            return "Surgery"
-                          case "O":
-                            return "OBGY"
-                          case "Misc":
-                            return "Miscellaneous"
-                          case "CM":
-                            return "Community Medicine"
-                          default:
-                            return phase
-                        }
-                      }
 
                       return (
                         <div
@@ -254,7 +303,7 @@ export function TimelineView() {
                           className={`absolute h-full border-2 ${getPhaseColor(phaseBlock.phase)} flex items-center justify-center text-xs font-medium transition-all duration-200 hover:shadow-lg cursor-pointer`}
                           style={{
                             left: `${left * zoomLevel}%`,
-                            width: `${width * zoomLevel}%`,
+                            width: `${Math.max(0.5, width * zoomLevel)}%`,
                             transform: hoveredItem === `phase-${batch}-${idx}` ? "translateY(-2px)" : "none",
                             zIndex: hoveredItem === `phase-${batch}-${idx}` ? 10 : 1,
                           }}
@@ -274,11 +323,12 @@ export function TimelineView() {
                         </div>
                       )
                     })}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     )
   }
@@ -296,49 +346,52 @@ export function TimelineView() {
 
     return (
       <div className="space-y-4">
-        {displayStudents.map((student) => (
-          <div key={student.id} className="relative">
-            <div className="flex items-center mb-2 justify-between">
-              <div className="flex items-center">
+        {displayStudents.map((student) => {
+          // Get all schedule items for this student
+          const studentScheduleItems = schedule
+            .filter((s) => s.studentId === student.id)
+            .filter((s) => {
+              // Filter by phase if selected
+              if (selectedPhase === "all") return true
+              const rotation = rotations.find((r) => r.code === s.rotation)
+              return rotation && rotation.phase === selectedPhase
+            })
+
+          return (
+            <div key={student.id} className="relative">
+              <div className="flex items-center mb-2 justify-between">
+                <div className="flex items-center">
+                  <div
+                    className={`w-3 h-3 rounded-full mr-2 ${
+                      student.batch === "A"
+                        ? "bg-blue-500"
+                        : student.batch === "B"
+                          ? "bg-green-500"
+                          : student.batch === "C"
+                            ? "bg-purple-500"
+                            : "bg-yellow-500"
+                    }`}
+                  ></div>
+                  <h3 className="text-sm font-medium truncate">{student.name}</h3>
+                </div>
+                <span className="text-xs text-gray-500">{student.regdNo}</span>
+              </div>
+
+              <div className="relative h-12 bg-gray-100 rounded-lg overflow-hidden">
+                {/* Current date indicator */}
                 <div
-                  className={`w-3 h-3 rounded-full mr-2 ${
-                    student.batch === "A"
-                      ? "bg-blue-500"
-                      : student.batch === "B"
-                        ? "bg-green-500"
-                        : student.batch === "C"
-                          ? "bg-purple-500"
-                          : "bg-yellow-500"
-                  }`}
-                ></div>
-                <h3 className="text-sm font-medium truncate">{student.name}</h3>
-              </div>
-              <span className="text-xs text-gray-500">{student.regdNo}</span>
-            </div>
+                  className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20"
+                  style={{
+                    left: `${(today.diff(startDate, "day") / totalDays) * 100 * zoomLevel}%`,
+                    height: "100%",
+                  }}
+                >
+                  <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
+                </div>
 
-            <div className="relative h-12 bg-gray-100 rounded-lg overflow-hidden">
-              {/* Current date indicator */}
-              <div
-                className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20"
-                style={{
-                  left: `${(today.diff(startDate, "day") / totalDays) * 100 * zoomLevel}%`,
-                  height: "100%",
-                }}
-              >
-                <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
-              </div>
-
-              {/* Rotation blocks */}
-              <div className="absolute inset-0">
-                {schedule
-                  .filter((s) => s.studentId === student.id)
-                  .filter((s) => {
-                    // Filter by phase if selected
-                    if (selectedPhase === "all") return true
-                    const rotation = rotations.find((r) => r.code === s.rotation)
-                    return rotation && rotation.phase === selectedPhase
-                  })
-                  .map((item, idx) => {
+                {/* Rotation blocks */}
+                <div className="absolute inset-0">
+                  {studentScheduleItems.map((item, idx) => {
                     const start = dayjs(item.startDate)
                     const end = dayjs(item.endDate)
                     const left = (start.diff(startDate, "day") / totalDays) * 100
@@ -359,7 +412,7 @@ export function TimelineView() {
                         className={`absolute h-full ${getRotationColorClass(item.rotation)} flex items-center justify-center text-xs font-medium transition-all duration-200 hover:shadow-lg cursor-pointer ${hasCollision ? "border-2 border-red-500" : ""} ${isCompleted ? "opacity-70" : ""}`}
                         style={{
                           left: `${left * zoomLevel}%`,
-                          width: `${width * zoomLevel}%`,
+                          width: `${Math.max(0.5, width * zoomLevel)}%`,
                           transform: hoveredItem === `rotation-${student.id}-${idx}` ? "translateY(-2px)" : "none",
                           zIndex: hoveredItem === `rotation-${student.id}-${idx}` ? 10 : 1,
                         }}
@@ -386,10 +439,11 @@ export function TimelineView() {
                       </div>
                     )
                   })}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
 
         {filteredStudents.length > 15 && (
           <div className="text-center text-sm text-gray-500 mt-4">
@@ -403,7 +457,7 @@ export function TimelineView() {
   // Generate rotation-based timeline
   const generateRotationTimeline = () => {
     // Group rotations by phase
-    const rotationsByPhase = rotations.reduce((acc: any, rotation) => {
+    const rotationsByPhase = rotations.reduce((acc: Record<string, typeof rotations>, rotation) => {
       // Filter by phase if selected
       if (selectedPhase !== "all" && rotation.phase !== selectedPhase) return acc
 
@@ -416,53 +470,43 @@ export function TimelineView() {
 
     return (
       <div className="space-y-8">
-        {Object.entries(rotationsByPhase).map(([phase, phaseRotations]: [string, any]) => (
+        {Object.entries(rotationsByPhase).map(([phase, phaseRotations]) => (
           <div key={phase} className="space-y-4">
-            <h3 className="text-lg font-semibold">
-              {phase === "M"
-                ? "Medicine"
-                : phase === "S"
-                  ? "Surgery"
-                  : phase === "O"
-                    ? "OBGY"
-                    : phase === "Misc"
-                      ? "Miscellaneous"
-                      : phase === "CM"
-                        ? "Community Medicine"
-                        : phase}
-            </h3>
+            <h3 className="text-lg font-semibold">{getPhaseName(phase)}</h3>
 
-            {phaseRotations.map((rotation: any) => (
-              <div key={rotation.code} className="relative">
-                <div className="flex items-center mb-2">
-                  <div className={`px-2 py-0.5 rounded text-xs ${getRotationColorClass(rotation.code)}`}>
-                    {rotation.code}
-                  </div>
-                  <h4 className="text-sm font-medium ml-2">{rotation.name}</h4>
-                </div>
+            {phaseRotations.map((rotation) => {
+              // Get all schedule items for this rotation
+              const rotationScheduleItems = schedule
+                .filter((s) => s.rotation === rotation.code)
+                .filter(
+                  (s) =>
+                    selectedBatch === "all" || students.find((st) => st.id === s.studentId)?.batch === selectedBatch,
+                )
 
-                <div className="relative h-10 bg-gray-100 rounded-lg overflow-hidden">
-                  {/* Current date indicator */}
-                  <div
-                    className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20"
-                    style={{
-                      left: `${(today.diff(startDate, "day") / totalDays) * 100 * zoomLevel}%`,
-                      height: "100%",
-                    }}
-                  >
-                    <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
+              return (
+                <div key={rotation.code} className="relative">
+                  <div className="flex items-center mb-2">
+                    <div className={`px-2 py-0.5 rounded text-xs ${getRotationColorClass(rotation.code)}`}>
+                      {rotation.code}
+                    </div>
+                    <h4 className="text-sm font-medium ml-2">{rotation.name}</h4>
                   </div>
 
-                  {/* Student blocks */}
-                  <div className="absolute inset-0">
-                    {schedule
-                      .filter((s) => s.rotation === rotation.code)
-                      .filter(
-                        (s) =>
-                          selectedBatch === "all" ||
-                          students.find((st) => st.id === s.studentId)?.batch === selectedBatch,
-                      )
-                      .map((item, idx) => {
+                  <div className="relative h-10 bg-gray-100 rounded-lg overflow-hidden">
+                    {/* Current date indicator */}
+                    <div
+                      className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20"
+                      style={{
+                        left: `${(today.diff(startDate, "day") / totalDays) * 100 * zoomLevel}%`,
+                        height: "100%",
+                      }}
+                    >
+                      <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
+                    </div>
+
+                    {/* Student blocks */}
+                    <div className="absolute inset-0">
+                      {rotationScheduleItems.map((item, idx) => {
                         const student = students.find((s) => s.id === item.studentId)
                         if (!student) return null
 
@@ -481,28 +525,13 @@ export function TimelineView() {
                         // Check if rotation is completed
                         const isCompleted = end.isBefore(today)
 
-                        const getBatchColor = (batch: string) => {
-                          switch (batch) {
-                            case "A":
-                              return "bg-blue-200 border-blue-400"
-                            case "B":
-                              return "bg-green-200 border-green-400"
-                            case "C":
-                              return "bg-purple-200 border-purple-400"
-                            case "D":
-                              return "bg-yellow-200 border-yellow-400"
-                            default:
-                              return "bg-gray-200 border-gray-400"
-                          }
-                        }
-
                         return (
                           <div
                             key={idx}
                             className={`absolute h-full ${getBatchColor(student.batch)} flex items-center justify-center text-xs font-medium transition-all duration-200 hover:shadow-lg cursor-pointer ${hasCollision ? "border-2 border-red-500" : "border"} ${isCompleted ? "opacity-70" : ""}`}
                             style={{
                               left: `${left * zoomLevel}%`,
-                              width: `${width * zoomLevel}%`,
+                              width: `${Math.max(0.5, width * zoomLevel)}%`,
                               transform:
                                 hoveredItem === `student-${rotation.code}-${idx}` ? "translateY(-2px)" : "none",
                               zIndex: hoveredItem === `student-${rotation.code}-${idx}` ? 10 : 1,
@@ -532,10 +561,11 @@ export function TimelineView() {
                           </div>
                         )
                       })}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         ))}
       </div>
@@ -576,6 +606,20 @@ export function TimelineView() {
     )
   }
 
+  // Generate timeline items based on view mode
+  const generateTimelineItems = () => {
+    switch (viewMode) {
+      case "batch":
+        return generateBatchTimeline()
+      case "student":
+        return generateStudentTimeline()
+      case "rotation":
+        return generateRotationTimeline()
+      default:
+        return null
+    }
+  }
+
   return (
     <Card className="mb-6 border border-gray-100">
       <CardHeader className="pb-2">
@@ -586,7 +630,7 @@ export function TimelineView() {
           </CardTitle>
 
           <div className="flex flex-wrap gap-2 items-center">
-            <Select value={viewMode} onValueChange={setViewMode}>
+            <Select value={viewMode} onValueChange={(value: "batch" | "student" | "rotation") => setViewMode(value)}>
               <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="View Mode" />
               </SelectTrigger>
@@ -616,11 +660,11 @@ export function TimelineView() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Phases</SelectItem>
-                <SelectItem value="M">Medicine</SelectItem>
-                <SelectItem value="S">Surgery</SelectItem>
-                <SelectItem value="O">OBGY</SelectItem>
-                <SelectItem value="Misc">Misc</SelectItem>
-                <SelectItem value="CM">Community Medicine</SelectItem>
+                <SelectItem value="MED">Medicine</SelectItem>
+                <SelectItem value="SUR">Surgery</SelectItem>
+                <SelectItem value="OBG">OBGY</SelectItem>
+                <SelectItem value="OTH">Others</SelectItem>
+                <SelectItem value="COM">Community Medicine</SelectItem>
               </SelectContent>
             </Select>
 
@@ -648,20 +692,7 @@ export function TimelineView() {
 
             <TooltipProvider>
               <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => {
-                    if (timelineRef.current) {
-                      const currentDayPosition = (today.diff(startDate, "day") / totalDays) * 100 * zoomLevel
-                      const scrollPosition =
-                        (timelineRef.current.scrollWidth * currentDayPosition) / 100 -
-                        timelineRef.current.clientWidth / 2
-                      timelineRef.current.scrollLeft = Math.max(0, scrollPosition)
-                    }
-                  }}
-                >
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={scrollToCurrentDate}>
                   <RefreshCw className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -679,84 +710,11 @@ export function TimelineView() {
             <LoadingSpinner message="Loading timeline data..." />
           </div>
         ) : (
-          <div className="animate-in fade-in-50 duration-300">
-            {collisions.length > 0 && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Schedule Conflicts Detected</AlertTitle>
-                <AlertDescription>
-                  Found {collisions.length} schedule conflicts. These are highlighted in red on the timeline.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            <div className="overflow-x-auto" ref={timelineRef}>
-              <div className="min-w-full" style={{ width: `${100 * zoomLevel}%` }}>
-                {renderTimelineRuler()}
-                {generateTimelineItems()}
-              </div>
+          <div className="animate-fade-in">
+            {renderTimelineRuler()}
+            <div ref={timelineRef} className="overflow-x-auto">
+              <div style={{ width: `${100 * zoomLevel}%` }}>{generateTimelineItems()}</div>
             </div>
-
-            {collisions.length > 0 && (
-              <div className="mt-6 border rounded-lg overflow-hidden">
-                <div className="bg-red-50 p-3 border-b border-red-200">
-                  <h3 className="text-red-800 font-medium flex items-center">
-                    <AlertCircle className="h-4 w-4 mr-2" />
-                    Schedule Conflicts
-                  </h3>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Student</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Batch</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Conflict</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Period</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Days</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {collisions.slice(0, 5).map((collision, idx) => (
-                        <tr key={idx} className="border-b">
-                          <td className="px-4 py-2">
-                            <div className="font-medium">{collision.regdNo}</div>
-                            <div className="text-xs text-gray-500">{collision.studentName}</div>
-                          </td>
-                          <td className="px-4 py-2">
-                            <Badge variant="outline">{collision.batch}</Badge>
-                          </td>
-                          <td className="px-4 py-2">
-                            <div className="flex items-center space-x-2">
-                              <span
-                                className={`px-2 py-0.5 rounded text-xs ${getRotationColorClass(collision.rotationA)}`}
-                              >
-                                {collision.rotationA}
-                              </span>
-                              <span>and</span>
-                              <span
-                                className={`px-2 py-0.5 rounded text-xs ${getRotationColorClass(collision.rotationB)}`}
-                              >
-                                {collision.rotationB}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-2 text-sm">
-                            {collision.startDate} to {collision.endDate}
-                          </td>
-                          <td className="px-4 py-2 text-sm font-medium text-red-600">{collision.daysOverlap} days</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                {collisions.length > 5 && (
-                  <div className="p-3 text-center text-sm text-gray-500">
-                    Showing 5 of {collisions.length} conflicts
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         )}
       </CardContent>

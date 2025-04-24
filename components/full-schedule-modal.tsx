@@ -218,12 +218,12 @@ export function FullScheduleModal() {
           {Object.entries(scheduleByPhase).map(([phase, weeks]) => (
             <div key={phase} className={`phase-group phase-group-${phase}`}>
               <h3 className="text-lg font-semibold mb-3">
-                {phase === "M" && "Medicine Phase"}
-                {phase === "S" && "Surgery Phase"}
-                {phase === "O" && "OBGY Phase"}
-                {phase === "Misc" && "Miscellaneous Phase"}
-                {phase === "CM" && "Community Medicine Phase"}
-                {!["M", "S", "O", "Misc", "CM"].includes(phase) && `${phase} Phase`}
+                {phase === "MED" && "Medicine Phase"}
+                {phase === "SUR" && "Surgery Phase"}
+                {phase === "OBG" && "OBGY Phase"}
+                {phase === "OTH" && "Others Phase"}
+                {phase === "COM" && "Community Medicine Phase"}
+                {!["MED", "SUR", "OBG", "OTH", "COM"].includes(phase) && `${phase} Phase`}
               </h3>
 
               <div className="overflow-x-auto">

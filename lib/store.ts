@@ -24,7 +24,7 @@ export interface StoreState {
   filters: Filters
 
   // View settings
-  viewType: "dashboard" | "calendar" | "student" | "rotation" | "batch" | "timeline"
+  viewType: "dashboard" | "calendar" | "student" | "rotation" | "batch"
   currentViewStartDate: Dayjs
   currentViewEndDate: Dayjs
   jumpToDate: string
@@ -63,7 +63,7 @@ export interface StoreState {
 
   // Methods
   initialize: () => Promise<void>
-  setViewType: (viewType: "dashboard" | "calendar" | "student" | "rotation" | "batch" | "timeline") => void
+  setViewType: (viewType: "dashboard" | "calendar" | "student" | "rotation" | "batch") => void
   toggleFilters: () => void
   setStudentSearchQuery: (query: string) => void
   setStudentListSearch: (search: string) => void
@@ -82,6 +82,7 @@ export interface StoreState {
   nextWeek: () => void
   prepareAndExportToCSV: () => void
   exportStudentScheduleToCSV: (studentId: string) => void
+  exportRotationDataToCSV: (rotationCode: string) => void
 
   // Helper methods
   getCurrentDate: () => Dayjs
@@ -225,7 +226,7 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
   initialize: async () => {
     // Set initial date range
     const startDate = dayjs("2025-04-01")
-    const today = dayjs("2025-04-15") // Set a fixed date to ensure all phases are visible
+    const today = dayjs() // Use actual current date instead of fixed date
 
     set({
       currentViewStartDate: startDate,
@@ -235,10 +236,15 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
         startDate: startDate.format("YYYY-MM-DD"),
         endDate: startDate.add(52, "week").format("YYYY-MM-DD"),
       },
-      jumpToDate: today.format("YYYY-MM-DD"),
+      jumpToDate: today.format("YYYY-MM-DD"), // Set to current date
       originalToday: dayjs,
       customToday: today,
     })
+
+    // If the viewType was previously set to "timeline", change it to "dashboard"
+    if (get().viewType === "timeline") {
+      set({ viewType: "dashboard" })
+    }
 
     // Load student data
     set({ loadingMessage: "Loading student data...", loadingSubMessage: "Fetching student records" })
@@ -426,31 +432,31 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
   // Define rotations
   defineRotations: () => {
     const rotations: RotationDefinition[] = [
-      { code: "GM", name: "General Medicine", phase: "M" },
-      { code: "PY", name: "Psychiatry", phase: "M" },
-      { code: "CA", name: "Casualty", phase: "M" },
-      { code: "EN", name: "ENT", phase: "M" },
+      { code: "GM", name: "General Medicine", phase: "MED" },
+      { code: "PY", name: "Psychiatry", phase: "MED" },
+      { code: "CA", name: "Casualty", phase: "MED" },
+      { code: "EN", name: "ENT", phase: "MED" },
 
-      { code: "GS", name: "General Surgery", phase: "S" },
-      { code: "AN", name: "Anesthesia", phase: "S" },
-      { code: "OR", name: "Orthopedics", phase: "S" },
-      { code: "OP", name: "Ophthalmology", phase: "S" },
+      { code: "GS", name: "General Surgery", phase: "SUR" },
+      { code: "AN", name: "Anesthesia", phase: "SUR" },
+      { code: "OR", name: "Orthopedics", phase: "SUR" },
+      { code: "OP", name: "Ophthalmology", phase: "SUR" },
 
-      { code: "OB", name: "Obstetrics", phase: "O" },
-      { code: "PE", name: "Pediatrics", phase: "O" },
-      { code: "RM", name: "Respiratory Medicine", phase: "O" },
-      { code: "RA", name: "Radiology", phase: "O" },
-      { code: "DE", name: "Dermatology", phase: "O" },
+      { code: "OB", name: "Obstetrics", phase: "OBG" },
+      { code: "PE", name: "Pediatrics", phase: "OBG" },
+      { code: "RM", name: "Respiratory Medicine", phase: "OBG" },
+      { code: "RA", name: "Radiology", phase: "OBG" },
+      { code: "DE", name: "Dermatology", phase: "OBG" },
 
-      { code: "YO", name: "Yoga", phase: "Misc" },
-      { code: "FP", name: "Family Planning", phase: "Misc" },
-      { code: "LM", name: "Legal Medicine", phase: "Misc" },
-      { code: "FM", name: "Forensic Medicine", phase: "Misc" },
+      { code: "YO", name: "Yoga", phase: "OTH" },
+      { code: "FP", name: "Family Planning", phase: "OTH" },
+      { code: "LM", name: "Legal Medicine", phase: "OTH" },
+      { code: "FM", name: "Forensic Medicine", phase: "OTH" },
 
-      { code: "CH", name: "Community Health", phase: "CM" },
-      { code: "PH", name: "Public Health", phase: "CM" },
-      { code: "UH", name: "Urban Health", phase: "CM" },
-      { code: "RH", name: "Rural Health", phase: "CM" },
+      { code: "CH", name: "Community Health", phase: "COM" },
+      { code: "PH", name: "Public Health", phase: "COM" },
+      { code: "UH", name: "Urban Health", phase: "COM" },
+      { code: "RH", name: "Rural Health", phase: "COM" },
     ]
 
     set({ rotations })
@@ -459,11 +465,11 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
   // Define phases
   definePhases: () => {
     const phases: Phase[] = [
-      { code: "M", name: "Medicine", weeks: 12 },
-      { code: "S", name: "Surgery", weeks: 12 },
-      { code: "O", name: "OBGY", weeks: 12 },
-      { code: "Misc", name: "Misc", weeks: 4 },
-      { code: "CM", name: "Community Medicine", weeks: 12 },
+      { code: "MED", name: "Medicine", weeks: 12 },
+      { code: "SUR", name: "Surgery", weeks: 12 },
+      { code: "OBG", name: "OBGY", weeks: 12 },
+      { code: "OTH", name: "Others", weeks: 4 },
+      { code: "COM", name: "Community Medicine", weeks: 12 },
     ]
 
     set({ phases })
@@ -472,10 +478,10 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
   // Define batch phases
   defineBatchPhases: () => {
     const batchPhases: Record<string, string[]> = {
-      A: ["M", "S", "O", "Misc", "CM"],
-      B: ["S", "O", "Misc", "CM", "M"],
-      C: ["O", "Misc", "CM", "M", "S"],
-      D: ["Misc", "CM", "M", "S", "O"],
+      A: ["MED", "SUR", "OBG", "OTH", "COM"],
+      B: ["SUR", "OBG", "OTH", "COM", "MED"],
+      C: ["OBG", "OTH", "COM", "MED", "SUR"],
+      D: ["OTH", "COM", "MED", "SUR", "OBG"],
     }
 
     set({ batchPhases })
@@ -500,15 +506,15 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
         const phaseEndDate = currentDate.add(phase.weeks, "week").subtract(1, "day")
 
         // Generate rotations based on phase type
-        if (phaseCode === "M") {
+        if (phaseCode === "MED") {
           get().generateMedicinePhase(batch, batchStudents, currentDate, phaseEndDate, schedule)
-        } else if (phaseCode === "S") {
+        } else if (phaseCode === "SUR") {
           get().generateSurgeryPhase(batch, batchStudents, currentDate, phaseEndDate, schedule)
-        } else if (phaseCode === "O") {
+        } else if (phaseCode === "OBG") {
           get().generateOBGYPhase(batch, batchStudents, currentDate, phaseEndDate, schedule)
-        } else if (phaseCode === "Misc") {
+        } else if (phaseCode === "OTH") {
           get().generateMiscPhase(batch, batchStudents, currentDate, phaseEndDate, schedule)
-        } else if (phaseCode === "CM") {
+        } else if (phaseCode === "COM") {
           get().generateCommunityMedicinePhase(batch, batchStudents, currentDate, phaseEndDate, schedule)
         }
 
@@ -1079,8 +1085,7 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
   },
 
   // UI state management
-  setViewType: (viewType: "dashboard" | "calendar" | "student" | "rotation" | "batch" | "timeline") =>
-    set({ viewType }),
+  setViewType: (viewType: "dashboard" | "calendar" | "student" | "rotation" | "batch") => set({ viewType }),
 
   toggleFilters: () => set((state) => ({ showFilters: !state.showFilters })),
 
@@ -1878,5 +1883,78 @@ export const useSchedulerStore = create<StoreState>((set, get) => ({
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  },
+
+  // New function to export rotation data to CSV
+  exportRotationDataToCSV: (rotationCode) => {
+    set({ showExportLoadingModal: true })
+
+    setTimeout(() => {
+      try {
+        const { students, rotations, getRotationName, getPhaseName, formatDate } = get()
+        const today = get().getCurrentDate()
+        const rotation = rotations.find((r) => r.code === rotationCode)
+
+        // Get all students currently in this rotation
+        const rotationStudents = get().getStudentsInRotation(rotationCode)
+
+        // Get schedule items for these students in this rotation
+        const { schedule } = get()
+        const rotationSchedules = schedule.filter(
+          (s) =>
+            s.rotation === rotationCode &&
+            rotationStudents.some((student) => student.id === s.studentId) &&
+            dayjs(s.startDate) <= today &&
+            dayjs(s.endDate) >= today,
+        )
+
+        const data = rotationStudents.map((student) => {
+          const scheduleItem = rotationSchedules.find((s) => s.studentId === student.id)
+
+          return {
+            "Registration Number": student.regdNo,
+            "Student Name": student.name,
+            Batch: student.batch,
+            "Rotation Code": rotationCode,
+            "Rotation Name": getRotationName(rotationCode),
+            Phase: rotation?.phase || "",
+            "Phase Name": getPhaseName(rotation?.phase || ""),
+            "Start Date": scheduleItem ? formatDate(scheduleItem.startDate) : "N/A",
+            "End Date": scheduleItem ? formatDate(scheduleItem.endDate) : "N/A",
+            "Duration (Days)": scheduleItem
+              ? dayjs(scheduleItem.endDate).diff(dayjs(scheduleItem.startDate), "day") + 1
+              : 0,
+          }
+        })
+
+        // Sort data by batch, then by student name
+        data.sort((a, b) => {
+          if (a.Batch !== b.Batch) return a.Batch.localeCompare(b.Batch)
+          return a["Student Name"].localeCompare(b["Student Name"])
+        })
+
+        const csv = Papa.unparse(data)
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+        const url = URL.createObjectURL(blob)
+
+        const link = document.createElement("a")
+        link.setAttribute("href", url)
+        link.setAttribute("download", `rotation_${rotationCode}_students_${dayjs().format("YYYY-MM-DD")}.csv`)
+        link.style.visibility = "hidden"
+
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        // Hide loading modal after export is complete
+        setTimeout(() => {
+          set({ showExportLoadingModal: false })
+        }, 500)
+      } catch (error) {
+        console.error("Error exporting rotation data:", error)
+        set({ showExportLoadingModal: false })
+        alert("An error occurred while exporting rotation data. Please try again.")
+      }
+    }, 800)
   },
 }))

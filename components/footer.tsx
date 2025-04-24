@@ -7,17 +7,11 @@ export function Footer() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center mb-4 md:mb-0">
-            <div className="bg-white p-1.5 rounded-full mr-3 w-12 h-12 flex items-center justify-center shadow-md">
-              <Image
-                src="https://gimsr.gitam.edu/Images/gimsr-image-ivory.svg"
-                alt="Logo"
-                width={48}
-                height={48}
-                className="rounded-full"
-              />
+            <div className="mr-3 w-18 h-18 flex items-center justify-center">
+              <Image src="https://gimsr.gitam.edu/Images/gimsr-image-ivory.svg" alt="Logo" width={128} height={128} />
             </div>
             <div>
-              <h2 className="text-lg font-bold">Medical Rotation Scheduler</h2>
+              <h2 className="text-lg font-bold">CRMI - GIMSR</h2>
               <p className="text-xs text-primary-100">© {new Date().getFullYear()} All Rights Reserved</p>
             </div>
           </div>

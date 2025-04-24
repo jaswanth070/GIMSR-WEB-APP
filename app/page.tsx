@@ -10,7 +10,6 @@ import { CalendarView } from "@/components/calendar-view"
 import { StudentView } from "@/components/student-view"
 import { RotationView } from "@/components/rotation-view"
 import { BatchView } from "@/components/batch-view"
-// import { TimelineView } from "@/components/timeline-view"
 import { FullScheduleModal } from "@/components/full-schedule-modal"
 import { SubPhaseStudentsModal } from "@/components/sub-phase-students-modal"
 import { ExportLoadingModal } from "@/components/export-loading-modal"
@@ -87,7 +86,6 @@ export default function Home() {
         {viewType === "student" && <StudentView />}
         {viewType === "rotation" && <RotationView />}
         {viewType === "batch" && <BatchView />}
-        {/* {viewType === "timeline" && <TimelineView />} */}
       </main>
 
       {/* Footer */}
